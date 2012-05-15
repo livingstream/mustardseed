@@ -1,20 +1,25 @@
 #include <iostream>
+#include <hash_map>
 using namespace std;
+#define Nmen 29
 struct mentions {
-	char* token; // The actual string
+	string token; // The actual string
 	int doc; // The identifier for the document (could be a string)
 	int para; // The number paragraph in the document
 	int word; // The number word in the pargraph
 	int pos; // Integer identifier for the part of speech
+        int entityId;
 };
 struct entity {
 	int id; // An unique identifier for the entity (in consequential)
+         
 };
+
 
 int main ()
 {
   int i=0;
-  mentions* mentionArray = new mentions[1000];
+  mentions* mentionArray = new mentions[Nmen];
   // Andrew MaCallum
   mentionArray[0].token="Andrew McCallum";
   mentionArray[1].token="Andrew MacCallum";
@@ -51,20 +56,8 @@ int main ()
   mentionArray[27].token="Canceda";
   mentionArray[28].token="Cancceda";
 
-  for(i=0;i<1000;i++){
-    mentionArray[i].token="abc";
-    mentionArray[i].doc=1;
-    mentionArray[i].para=1;
-    mentionArray[i].word=1;
-    mentionArray[i].pos=1;
-  }
-  
-  for(i=0;i<1000;i++){
-    cout << mentionArray[i].token << endl;
-    cout << mentionArray[i].doc << endl; 
-    cout << mentionArray[i].para << endl;
-    cout << mentionArray[i].word << endl;
-    cout << mentionArray[i].pos <<endl;
+  for(i=0;i<Nmen;i++){
+    mentionArray[i].entityId=i;
   }
   
   return 0;
