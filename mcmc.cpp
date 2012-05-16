@@ -16,28 +16,26 @@ struct entity {
         set<int>mentions;         
 };
 
-bool affinity(string str1, string str2){
+int affinity(string str1, string str2){
   int sumAff=0;
-  str1="abced";
-  str2="abced";
   // match the the prefix with 1 character
-  if(str1.substr(0,1).compare(str2.substr(0,1))==0) sumAff+=2; 
+  if(str1.substr(0,1).compare(str2.substr(0,1))==0) sumAff+=1; 
   if(str1.substr(0,2).compare(str2.substr(0,2))==0) sumAff+=2;
   if(str1.substr(0,3).compare(str2.substr(0,3))==0) sumAff+=3;
   if(str1.find(str2)!=string::npos) sumAff+=10;
   if(str2.find(str1)!=string::npos) sumAff+=10;
-  if(str1.length()==str2.length()) sumAff+=2;
+  if(str1.length()==str2.length()) sumAff+=3;
   istringstream iss(str1);
   do{
       string sub;
       iss >> sub;
-      if(str2.find(sub)!=string::npos) sumAff+=3;
+      if(sub!="" && str2.find(sub)!=string::npos) sumAff+=4;
   } while (iss);
   istringstream iss2(str2);
   do{
       string sub;
       iss2 >> sub;
-      if(str1.find(sub)!=string::npos) sumAff+=3;
+      if(sub!="" && str1.find(sub)!=string::npos) sumAff+=4;
   } while (iss2);
   return sumAff;
 }
@@ -99,7 +97,10 @@ int main ()
          cout<<mentionArray[i].token<<"	"<<mentionArray[j].token<<"	"<<score<<endl;
       }
     }
-  } 
+  }
+
+  //propose a change 
+   
   //set<int>::iterator it; 
   //it=entityArray[4].mentions.begin();
   //for (it=entityArray[4].mentions.begin(); it!=entityArray[4].mentions.end(); ++it)
