@@ -164,7 +164,7 @@ int main ()
       if(emptyEntityVector.size()>0){ 
          accepted+=1;
          int pos=(rand())%(emptyEntityVector.size());
-         entityArray[pos].mentions.insert(randomMention); 
+         entityArray[emptyEntityVector.at(pos)].mentions.insert(randomMention); 
          set<int>::iterator it;
          int loss=0;
          for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
