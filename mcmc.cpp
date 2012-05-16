@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 #define Nmen 29 // number of mentions
-#define Ninter 10000 // number of iterations
+#define Niter 10000 // number of iterations
 struct mentions {
 	string token; // The actual string
 	int doc; // The identifier for the document (could be a string)
@@ -100,7 +100,7 @@ int main ()
          int score=affinity(mentionArray[i].token,mentionArray[j].token);
          affinityArray[i][j]=score;
          affinityArray[j][i]=score;
-         cout<<mentionArray[i].token<<"	"<<mentionArray[j].token<<"	"<<score<<endl;
+         //cout<<mentionArray[i].token<<" "<<mentionArray[j].token<<" "<<score<<endl;
       } else if (j==i){
           affinityArray[i][j]=0;
       }
@@ -111,8 +111,10 @@ int main ()
   int iter=0;
   int randomMention=0;
   int randomEntity=0;
+  int accepted=0;
+  int rejected=0;
   srand((unsigned)time(0));
-  while(iter<Ninter){
+  while(iter<Niter){
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
@@ -132,6 +134,7 @@ int main ()
         }
         //accept or not
         if(gain>loss){// we should accept it
+           accepted+=1;
            //remove the mention from old entity and place it into the new entity
            entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
            entityArray[randomEntity].mentions.insert(randomMention);
@@ -141,6 +144,7 @@ int main ()
           double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
           double p=((double)rand()/(double)RAND_MAX);
           if(ratio>p){// accept it
+             accepted+=1;
              //remove the mention from old entity and place it into the new entity
              entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
              entityArray[randomEntity].mentions.insert(randomMention);
@@ -158,6 +162,7 @@ int main ()
          }
       }
       if(emptyEntityVector.size()>0){ 
+         accepted+=1;
          int pos=(rand())%(emptyEntityVector.size());
          entityArray[pos].mentions.insert(randomMention); 
          set<int>::iterator it;
@@ -171,6 +176,9 @@ int main ()
       }
     }
   }
+  cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
+  cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
+  
   //set<int>::iterator it; 
   //it=entityArray[4].mentions.begin();
   //for (it=entityArray[4].mentions.begin(); it!=entityArray[4].mentions.end(); ++it)
