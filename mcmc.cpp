@@ -21,6 +21,7 @@ struct entity {
         set<int>mentions; // all the mentions belong to the entity   
 };
 
+// affinity factor or features
 int affinity(string str1, string str2){
   int sumAff=0;
   // match the the prefix with 1 character
