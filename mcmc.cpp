@@ -1,8 +1,11 @@
 #include <iostream>
 #include <sstream>
 #include <set>
+#include <ctime>
+#include <cstdlib>
 using namespace std;
 #define Nmen 29
+#define Ninter 10000
 struct mentions {
 	string token; // The actual string
 	int doc; // The identifier for the document (could be a string)
@@ -98,9 +101,27 @@ int main ()
       }
     }
   }
-
+  
   //propose a change 
-   
+  int iter=0;
+  int randomMention=0;
+  int randomEntity=0;
+  srand((unsigned)time(0));
+  while(iter<Ninter){
+    iter=inter+1;
+    randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
+    if(entityArray[randomMention.entityId].mentions.size()==1||
+      ((double)rand()/(double)RAND_MAX)<=0.8){
+      randomEntity=random()%Nmen;
+      if(randomEntity!=randomMention.entityId){
+        //remove the mention from old entity and place it into the new entity
+       int loss=
+       int gain=        
+      }
+    } else { // place it in an empty or its own entity
+       
+    }
+  }
   //set<int>::iterator it; 
   //it=entityArray[4].mentions.begin();
   //for (it=entityArray[4].mentions.begin(); it!=entityArray[4].mentions.end(); ++it)
