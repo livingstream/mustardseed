@@ -6,8 +6,8 @@
 #include <math.h>
 #include <vector>
 using namespace std;
-#define Nmen 29
-#define Ninter 10000
+#define Nmen 29 // number of mentions
+#define Ninter 10000 // number of iterations
 struct mentions {
 	string token; // The actual string
 	int doc; // The identifier for the document (could be a string)
