@@ -112,7 +112,7 @@ int main ()
   int randomEntity=0;
   srand((unsigned)time(0));
   while(iter<Ninter){
-    iter=inter+1;
+    iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
       ((double)rand()/(double)RAND_MAX)<=0.8){
@@ -120,7 +120,7 @@ int main ()
       if(randomEntity!=mentionArray[randomMention].entityId){
         //remove the mention from old entity and place it into the new entity
         entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
-        set<int>::interator it;
+        set<int>::iterator it;
         int loss=0;
         for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
              entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
@@ -135,15 +135,15 @@ int main ()
         if(gain>loss){// we should accept it
            entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
            entityArray[randomEntity].mentions.insert(randomMention);
-           currentEntropy=currentEntropy+gaine-loss;
+           currentEntropy=currentEntropy+gain-loss;
         } else {// accept it with a probablity
-          if(currentEntropy==0){cout<<"error! devided by 0"; return;}
+          if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
           double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
           double p=((double)rand()/(double)RAND_MAX);
-          if(ration>p){// accept it
+          if(ratio>p){// accept it
              entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
              entityArray[randomEntity].mentions.insert(randomMention);
-             currentEntropy=currentEntropy+gaine-loss;
+             currentEntropy=currentEntropy+gain-loss;
           }
         }
          
@@ -153,13 +153,13 @@ int main ()
       vector<int>emptyEntityVector;
       for(i=0;i<Nmen;i++){
          if(entityArray[i].mentions.size()==0){
-            emptyEntityVector.add(i);
+            emptyEntityVector.push_back(i);
          }
       }
       if(emptyEntityVector.size()>0){ 
          int pos=(rand())%(emptyEntityVector.size());
          entityArray[pos].mentions.insert(randomMention); 
-         set<int>::interator it;
+         set<int>::iterator it;
          int loss=0;
          for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
              entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
