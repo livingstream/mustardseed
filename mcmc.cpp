@@ -3,6 +3,8 @@
 #include <set>
 #include <ctime>
 #include <cstdlib>
+#include <math.h>
+#include <vector>
 using namespace std;
 #define Nmen 29
 #define Ninter 10000
@@ -46,7 +48,7 @@ int affinity(string str1, string str2){
 
 int main ()
 {
-  int i=0,j=0;
+  int i=0,j=0; int currentEntropy=1;
   int affinityArray[Nmen][Nmen];
   mentions* mentionArray = new mentions[Nmen];
   entity* entityArray = new entity[Nmen];
@@ -98,7 +100,9 @@ int main ()
          affinityArray[i][j]=score;
          affinityArray[j][i]=score;
          cout<<mentionArray[i].token<<"	"<<mentionArray[j].token<<"	"<<score<<endl;
-      }
+      } else if (j==i){
+          affinityArray[i][j]=0;
+        }
     }
   }
   
@@ -110,16 +114,60 @@ int main ()
   while(iter<Ninter){
     iter=inter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
-    if(entityArray[randomMention.entityId].mentions.size()==1||
+    if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
       ((double)rand()/(double)RAND_MAX)<=0.8){
       randomEntity=random()%Nmen;
-      if(randomEntity!=randomMention.entityId){
+      if(randomEntity!=mentionArray[randomMention].entityId){
         //remove the mention from old entity and place it into the new entity
-       int loss=
-       int gain=        
+        entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+        set<int>::interator it;
+        int loss=0;
+        for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
+             entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
+             loss+=affinityArray[randomMention][*it];
+        }
+        int gain=0;        
+        for(it=entityArray[randomEntity].mentions.begin();it!=
+            entityArray[randomEntity].mentions.end();++it){
+            gain+=affinityArray[randomMention][*it];
+        }
+        //accept or not
+        if(gain>loss){// we should accept it
+           entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+           entityArray[randomEntity].mentions.insert(randomMention);
+           currentEntropy=currentEntropy+gaine-loss;
+        } else {// accept it with a probablity
+          if(currentEntropy==0){cout<<"error! devided by 0"; return;}
+          double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
+          double p=((double)rand()/(double)RAND_MAX);
+          if(ration>p){// accept it
+             entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+             entityArray[randomEntity].mentions.insert(randomMention);
+             currentEntropy=currentEntropy+gaine-loss;
+          }
+        }
+         
       }
-    } else { // place it in an empty or its own entity
-       
+    } else { // place it in an empty or create a new entity
+             // TODO create a new entity
+      vector<int>emptyEntityVector;
+      for(i=0;i<Nmen;i++){
+         if(entityArray[i].mentions.size()==0){
+            emptyEntityVector.add(i);
+         }
+      }
+      if(emptyEntityVector.size()>0){ 
+         int pos=(rand())%(emptyEntityVector.size());
+         entityArray[pos].mentions.insert(randomMention); 
+         set<int>::interator it;
+         int loss=0;
+         for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
+             entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
+             loss+=affinityArray[randomMention][*it];
+         }
+         currentEntropy=currentEntropy-loss;
+         entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+      }
     }
   }
   //set<int>::iterator it; 
