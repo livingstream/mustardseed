@@ -90,8 +90,8 @@ int main ()
   mentionArray[28].token="Cancceda";
 
   for(i=0;i<Nmen;i++){
-    mentionArray[i].entityId=i;
-    entityArray[i].mentions.insert(i);
+      mentionArray[i].entityId=i;
+      entityArray[i].mentions.insert(i);
   }
   // calcualte the affinity score 
   for(i=0;i<Nmen;i++){
@@ -118,48 +118,47 @@ int main ()
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
-      ((double)rand()/(double)RAND_MAX)<=0.8){
-      randomEntity=rand()%Nmen;
-      if(randomEntity!=mentionArray[randomMention].entityId){
-        set<int>::iterator it;
-        int loss=0;
-        for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
-             entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
-             loss+=affinityArray[randomMention][*it];
-        }
-        int gain=0;        
-        for(it=entityArray[randomEntity].mentions.begin();it!=
-            entityArray[randomEntity].mentions.end();++it){
-            gain+=affinityArray[randomMention][*it];
-        }
-        //accept or not
-        if(gain>loss){// we should accept it
-           accepted+=1;
-           //remove the mention from old entity and place it into the new entity
-           entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
-           entityArray[randomEntity].mentions.insert(randomMention);
-           currentEntropy=currentEntropy+gain-loss;
-        } else {// accept it with a probablity
-          if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
-          double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
-          double p=((double)rand()/(double)RAND_MAX);
-          if(ratio>p){// accept it
+       ((double)rand()/(double)RAND_MAX)<=0.8){
+       randomEntity=rand()%Nmen;
+       if(randomEntity!=mentionArray[randomMention].entityId){
+          set<int>::iterator it;
+          int loss=0;
+          for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
+              entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
+              loss+=affinityArray[randomMention][*it];
+          }
+          int gain=0;        
+          for(it=entityArray[randomEntity].mentions.begin();it!=
+              entityArray[randomEntity].mentions.end();++it){
+              gain+=affinityArray[randomMention][*it];
+          }
+          //accept or not
+          if(gain>loss){// we should accept it
              accepted+=1;
              //remove the mention from old entity and place it into the new entity
              entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
              entityArray[randomEntity].mentions.insert(randomMention);
              currentEntropy=currentEntropy+gain-loss;
+          } else {// accept it with a probablity
+            if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
+            double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
+            double p=((double)rand()/(double)RAND_MAX);
+            if(ratio>p){// accept it
+               accepted+=1;
+               //remove the mention from old entity and place it into the new entity
+               entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+               entityArray[randomEntity].mentions.insert(randomMention);
+               currentEntropy=currentEntropy+gain-loss;
+            }
           }
-        }
-         
-      }
+       }
     } else { // place it in an empty or create a new entity
              // TODO create a new entity
       vector<int>emptyEntityVector;
       for(i=0;i<Nmen;i++){
-         if(entityArray[i].mentions.size()==0){
-            emptyEntityVector.push_back(i);
-         }
+          if(entityArray[i].mentions.size()==0){
+             emptyEntityVector.push_back(i);
+          }
       }
       if(emptyEntityVector.size()>0){ 
          accepted+=1;
