@@ -117,7 +117,7 @@ int main ()
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
       ((double)rand()/(double)RAND_MAX)<=0.8){
-      randomEntity=random()%Nmen;
+      randomEntity=rand()%Nmen;
       if(randomEntity!=mentionArray[randomMention].entityId){
         //remove the mention from old entity and place it into the new entity
         entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
