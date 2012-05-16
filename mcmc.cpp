@@ -175,6 +175,7 @@ int main ()
          entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
       }
     }
+    cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
   }
   cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
