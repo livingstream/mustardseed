@@ -103,7 +103,7 @@ int main ()
          cout<<mentionArray[i].token<<"	"<<mentionArray[j].token<<"	"<<score<<endl;
       } else if (j==i){
           affinityArray[i][j]=0;
-        }
+      }
     }
   }
   
