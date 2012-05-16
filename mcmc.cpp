@@ -119,8 +119,6 @@ int main ()
       ((double)rand()/(double)RAND_MAX)<=0.8){
       randomEntity=rand()%Nmen;
       if(randomEntity!=mentionArray[randomMention].entityId){
-        //remove the mention from old entity and place it into the new entity
-        entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
         set<int>::iterator it;
         int loss=0;
         for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
@@ -134,6 +132,7 @@ int main ()
         }
         //accept or not
         if(gain>loss){// we should accept it
+           //remove the mention from old entity and place it into the new entity
            entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
            entityArray[randomEntity].mentions.insert(randomMention);
            currentEntropy=currentEntropy+gain-loss;
@@ -142,6 +141,7 @@ int main ()
           double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
           double p=((double)rand()/(double)RAND_MAX);
           if(ratio>p){// accept it
+             //remove the mention from old entity and place it into the new entity
              entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
              entityArray[randomEntity].mentions.insert(randomMention);
              currentEntropy=currentEntropy+gain-loss;
