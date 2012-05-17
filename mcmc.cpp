@@ -25,23 +25,63 @@ struct entity {
 int affinity(string str1, string str2){
   int sumAff=0;
   // match the the prefix with 1 character
-  if(str1.substr(0,1).compare(str2.substr(0,1))==0) sumAff+=1; 
-  if(str1.substr(0,2).compare(str2.substr(0,2))==0) sumAff+=2;
-  if(str1.substr(0,3).compare(str2.substr(0,3))==0) sumAff+=3;
-  if(str1.find(str2)!=string::npos) sumAff+=10;
-  if(str2.find(str1)!=string::npos) sumAff+=10;
-  if(str1.length()==str2.length()) sumAff+=3;
+  if(str1.substr(0,1).compare(str2.substr(0,1))==0){
+    sumAff+=1;
+  } else{
+    sumAff-=1;
+  }
+    
+  if(str1.substr(0,2).compare(str2.substr(0,2))==0){
+     sumAff+=2;
+  } else{
+    sumAff-=1;
+  }
+  
+  if(str1.substr(0,3).compare(str2.substr(0,3))==0){
+     sumAff+=3;
+  } else{
+     sumAff-=1;
+  }
+  
+  if(str1.find(str2)!=string::npos){
+     sumAff+=10;
+  } else{
+     sumAff-=1;
+  }
+
+  if(str2.find(str1)!=string::npos){
+     sumAff+=10;
+  } else{
+     sumAff-=1;
+  }
+ 
+  if(str1.length()==str2.length()){
+    sumAff+=3;
+  } else{
+    sumAff-=0;
+  }
+ 
   istringstream iss(str1);
   do{
       string sub;
       iss >> sub;
-      if(sub!="" && str2.find(sub)!=string::npos) sumAff+=4;
+      if(sub!="" && str2.find(sub)!=string::npos) { 
+        sumAff+=4;
+      }
+      else{
+           sumAff-=0;
+      }
   } while (iss);
+
   istringstream iss2(str2);
   do{
       string sub;
       iss2 >> sub;
-      if(sub!="" && str1.find(sub)!=string::npos) sumAff+=4;
+      if(sub!="" && str1.find(sub)!=string::npos) {
+         sumAff+=4;
+      } else{
+        sumAff-=0;
+      }
   } while (iss2);
   return sumAff;
 }
