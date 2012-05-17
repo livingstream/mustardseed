@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 #define Nmen 29 // number of mentions
-#define Niter 10000 // number of iterations
+#define Niter 20000 // number of iterations
 struct mentions {
 	string token; // The actual string
 	int doc; // The identifier for the document (could be a string)
@@ -25,23 +25,63 @@ struct entity {
 int affinity(string str1, string str2){
   int sumAff=0;
   // match the the prefix with 1 character
-  if(str1.substr(0,1).compare(str2.substr(0,1))==0) sumAff+=1; 
-  if(str1.substr(0,2).compare(str2.substr(0,2))==0) sumAff+=2;
-  if(str1.substr(0,3).compare(str2.substr(0,3))==0) sumAff+=3;
-  if(str1.find(str2)!=string::npos) sumAff+=10;
-  if(str2.find(str1)!=string::npos) sumAff+=10;
-  if(str1.length()==str2.length()) sumAff+=3;
+  if(str1.substr(0,1).compare(str2.substr(0,1))==0){
+    sumAff+=1;
+  } else{
+    sumAff-=1;
+  }
+    
+  if(str1.substr(0,2).compare(str2.substr(0,2))==0){
+     sumAff+=2;
+  } else{
+    sumAff-=1;
+  }
+  
+  if(str1.substr(0,3).compare(str2.substr(0,3))==0){
+     sumAff+=3;
+  } else{
+     sumAff-=1;
+  }
+  
+  if(str1.find(str2)!=string::npos){
+     sumAff+=10;
+  } else{
+     sumAff-=1;
+  }
+
+  if(str2.find(str1)!=string::npos){
+     sumAff+=10;
+  } else{
+     sumAff-=1;
+  }
+ 
+  if(str1.length()==str2.length()){
+    sumAff+=3;
+  } else{
+    sumAff-=0;
+  }
+ 
   istringstream iss(str1);
   do{
       string sub;
       iss >> sub;
-      if(sub!="" && str2.find(sub)!=string::npos) sumAff+=4;
+      if(sub!="" && str2.find(sub)!=string::npos) { 
+        sumAff+=4;
+      }
+      else{
+           sumAff-=0;
+      }
   } while (iss);
+
   istringstream iss2(str2);
   do{
       string sub;
       iss2 >> sub;
-      if(sub!="" && str1.find(sub)!=string::npos) sumAff+=4;
+      if(sub!="" && str1.find(sub)!=string::npos) {
+         sumAff+=4;
+      } else{
+        sumAff-=0;
+      }
   } while (iss2);
   return sumAff;
 }
@@ -117,43 +157,11 @@ int main ()
   while(iter<Niter){
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
+    randomEntity=-1;
     if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
        ((double)rand()/(double)RAND_MAX)<=0.8){
        randomEntity=rand()%Nmen;
-       if(randomEntity!=mentionArray[randomMention].entityId){
-          set<int>::iterator it;
-          int loss=0;
-          for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
-              entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
-              loss+=affinityArray[randomMention][*it];
-          }
-          int gain=0;        
-          for(it=entityArray[randomEntity].mentions.begin();it!=
-              entityArray[randomEntity].mentions.end();++it){
-              gain+=affinityArray[randomMention][*it];
-          }
-          //accept or not
-          if(gain>loss){// we should accept it
-             accepted+=1;
-             //remove the mention from old entity and place it into the new entity
-             entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
-             entityArray[randomEntity].mentions.insert(randomMention);
-             currentEntropy=currentEntropy+gain-loss;
-          } else {// accept it with a probablity
-            if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
-            double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
-            double p=((double)rand()/(double)RAND_MAX);
-            if(ratio>p){// accept it
-               accepted+=1;
-               //remove the mention from old entity and place it into the new entity
-               entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
-               entityArray[randomEntity].mentions.insert(randomMention);
-               currentEntropy=currentEntropy+gain-loss;
-            }
-          }
-       }
-    } else { // place it in an empty or create a new entity
-             // TODO create a new entity
+    } else{ // place it in an empty or create a new entity TODO create a new entity
       vector<int>emptyEntityVector;
       for(i=0;i<Nmen;i++){
           if(entityArray[i].mentions.size()==0){
@@ -161,28 +169,52 @@ int main ()
           }
       }
       if(emptyEntityVector.size()>0){ 
-         accepted+=1;
          int pos=(rand())%(emptyEntityVector.size());
-         entityArray[emptyEntityVector.at(pos)].mentions.insert(randomMention); 
-         set<int>::iterator it;
-         int loss=0;
-         for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
-             entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
-             loss+=affinityArray[randomMention][*it];
-         }
-         currentEntropy=currentEntropy-loss;
-         entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+         randomEntity=emptyEntityVector.at(pos);
+         emptyEntityVector.clear();
       }
+    }
+    if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
+       set<int>::iterator it;
+       int loss=0;
+       for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
+           entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
+           loss+=affinityArray[randomMention][*it];
+       }
+       int gain=0;
+       for(it=entityArray[randomEntity].mentions.begin();it!=
+           entityArray[randomEntity].mentions.end();++it){
+           gain+=affinityArray[randomMention][*it];
+       }
+       //accept or not
+       if(gain>loss){// we should accept it
+          accepted+=1;
+          //remove the mention from old entity and place it into the new entity
+          entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+          entityArray[randomEntity].mentions.insert(randomMention);
+          mentionArray[randomMention].entityId=randomEntity;
+          currentEntropy=currentEntropy+gain-loss;
+       } else {// accept it with a probablity
+               if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
+               double ratio=exp(gain-loss);
+               double p=((double)rand()/(double)RAND_MAX);
+               if(ratio>p){// accept it
+                  accepted+=1;
+                  //remove the mention from old entity and place it into the new entity
+                  entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+                  entityArray[randomEntity].mentions.insert(randomMention);
+                  mentionArray[randomMention].entityId=randomEntity;
+                  currentEntropy=currentEntropy+gain-loss;
+               }
+       }
     }
     cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
   }
   cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
   
-  //set<int>::iterator it; 
-  //it=entityArray[4].mentions.begin();
-  //for (it=entityArray[4].mentions.begin(); it!=entityArray[4].mentions.end(); ++it)
-  //    cout << " " << *it;
+  for(i=0; i<Nmen; i++)
+     cout << "mention " << i<< "	"<<mentionArray[i].entityId<<endl;
   
   return 0;
 }
