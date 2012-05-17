@@ -131,6 +131,7 @@ int main ()
       if(emptyEntityVector.size()>0){ 
          int pos=(rand())%(emptyEntityVector.size());
          randomEntity=emptyEntityVector.at(pos);
+         emptyEntityVector.clear();
       }
     }
     if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
