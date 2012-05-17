@@ -129,17 +129,8 @@ int main ()
           }
       }
       if(emptyEntityVector.size()>0){ 
-         accepted+=1;
          int pos=(rand())%(emptyEntityVector.size());
-         entityArray[emptyEntityVector.at(pos)].mentions.insert(randomMention); 
-         set<int>::iterator it;
-         int loss=0;
-         for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
-             entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
-             loss+=affinityArray[randomMention][*it];
-         }
-         currentEntropy=currentEntropy-loss;
-         entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+         randomEntity=emptyEntityVector.at(pos);
       }
     }
     if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
