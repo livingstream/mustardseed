@@ -166,12 +166,12 @@ int main ()
                double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
                double p=((double)rand()/(double)RAND_MAX);
                if(ratio>p){// accept it
-               accepted+=1;
-               //remove the mention from old entity and place it into the new entity
-               entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
-               entityArray[randomEntity].mentions.insert(randomMention);
-               currentEntropy=currentEntropy+gain-loss;
-            }
+                  accepted+=1;
+                  //remove the mention from old entity and place it into the new entity
+                  entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
+                  entityArray[randomEntity].mentions.insert(randomMention);
+                  currentEntropy=currentEntropy+gain-loss;
+               }
        }
     }
     cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
