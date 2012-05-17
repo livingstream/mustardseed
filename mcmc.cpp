@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 #define Nmen 29 // number of mentions
-#define Niter 10000 // number of iterations
+#define Niter 5000 // number of iterations
 struct mentions {
 	string token; // The actual string
 	int doc; // The identifier for the document (could be a string)
@@ -151,6 +151,7 @@ int main ()
           //remove the mention from old entity and place it into the new entity
           entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
           entityArray[randomEntity].mentions.insert(randomMention);
+          mentionArray[randomMention].entityId=randomEntity;
           currentEntropy=currentEntropy+gain-loss;
        } else {// accept it with a probablity
                if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
@@ -161,6 +162,7 @@ int main ()
                   //remove the mention from old entity and place it into the new entity
                   entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
                   entityArray[randomEntity].mentions.insert(randomMention);
+                  mentionArray[randomMention].entityId=randomEntity;
                   currentEntropy=currentEntropy+gain-loss;
                }
        }
