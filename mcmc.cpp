@@ -154,7 +154,7 @@ int main ()
           currentEntropy=currentEntropy+gain-loss;
        } else {// accept it with a probablity
                if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
-               double ratio=exp((double)(currentEntropy+gain-loss)/(double)currentEntropy);
+               double ratio=exp(gain-loss);
                double p=((double)rand()/(double)RAND_MAX);
                if(ratio>p){// accept it
                   accepted+=1;
