@@ -117,7 +117,7 @@ int main ()
   while(iter<Niter){
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
-    randomMention=-1;
+    randomEntity=-1;
     if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
        ((double)rand()/(double)RAND_MAX)<=0.8){
        randomEntity=rand()%Nmen;
