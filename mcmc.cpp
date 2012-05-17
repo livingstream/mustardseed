@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 #define Nmen 29 // number of mentions
-#define Niter 10000 // number of iterations
+#define Niter 20000 // number of iterations
 struct mentions {
 	string token; // The actual string
 	int doc; // The identifier for the document (could be a string)
@@ -172,10 +172,8 @@ int main ()
   cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
   
-  //set<int>::iterator it; 
-  //it=entityArray[4].mentions.begin();
-  //for (it=entityArray[4].mentions.begin(); it!=entityArray[4].mentions.end(); ++it)
-  //    cout << " " << *it;
+  for(i=0; i<Nmen; i++)
+     cout << "mention " << i<< "	"<<mentionArray[i].entityId<<endl;
   
   return 0;
 }
