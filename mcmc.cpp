@@ -42,8 +42,10 @@ int affinity(mentions *mention1, mentions *mention2){
 
   str1Len==str2Len ? sumAff+=3 : sumAff-=0;
   
-  const char* split = " ";
-  char *saveptr1,*saveptr2,*p;
+  const char* split=" ";
+  char *saveptr1=NULL;
+  char *saveptr2=NULL;
+  char *p;
 
   p=strtok_r(str1,split,&saveptr1);
   minLen=min(str2Len,(int)strlen(p));
