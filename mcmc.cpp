@@ -22,7 +22,9 @@ struct entity {
 };
 
 // affinity factor or features
-int affinity(string str1, string str2){
+int affinity(mentions *mention1, mentions *mention2){
+  string str1=mention1->token;
+  string str2=mention2->token;
   int sumAff=0;
   // match the the prefix with 1 character
   if(str1.substr(0,1).compare(str2.substr(0,1))==0){
@@ -137,7 +139,7 @@ int main ()
   for(i=0;i<Nmen;i++){
     for(j=0;j<Nmen;j++){
       if(j>i) {
-         int score=affinity(mentionArray[i].token,mentionArray[j].token);
+         int score=affinity(&mentionArray[i],&mentionArray[j]);
          affinityArray[i][j]=score;
          affinityArray[j][i]=score;
          //cout<<mentionArray[i].token<<" "<<mentionArray[j].token<<" "<<score<<endl;
