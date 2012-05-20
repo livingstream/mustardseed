@@ -9,7 +9,7 @@ using namespace std;
 #define Nmen 29 // number of mentions
 #define Niter 20000 // number of iterations
 struct mentions {
-	string token; // The actual string
+	char* token; // The actual string
 	int doc; // The identifier for the document (could be a string)
 	int para; // The number paragraph in the document
 	int word; // The number word in the pargraph
@@ -23,30 +23,50 @@ struct entity {
 
 // affinity factor or features
 int affinity(mentions *mention1, mentions *mention2){
-  string str1=mention1->token;
-  string str2=mention2->token;
+  char* str1=mention1->token;
+  char* str2=mention2->token;
+  int str1Len=strlen(str1);
+  int str2Len=strlen(str2);
   int sumAff=0;
   // match the the prefix with 1 character
-  str1.substr(0,1).compare(str2.substr(0,1))==0 ? sumAff+=1:sumAff-=1;
-  str1.substr(0,2).compare(str2.substr(0,2))==0 ? sumAff+=2:sumAff-=1;
-  str1.substr(0,3).compare(str2.substr(0,3))==0 ? sumAff+=3:sumAff-=1;
-  str1.find(str2)!=string::npos ? sumAff+=10:sumAff-=1;  
-  str2.find(str1)!=string::npos ? sumAff+=10:sumAff-=1;  
-  str1.length()==str2.length() ? sumAff+=3:sumAff-=0;  
- 
-  istringstream iss(str1);
-  do{
-      string sub;
-      iss >> sub;
-      sub!="" && str2.find(sub)!=string::npos ? sumAff+=4:sumAff-=0;
-  } while (iss);
+  bool firstMatch = (str1[0]==str2[0]);
+  bool secondMatch = (str1[1]==str2[1]);
+  bool thirdMatch = (str1[2]==str2[2]);
+  
+  firstMatch ? sumAff+=1 : sumAff-=1;
+  firstMatch&&secondMatch ? sumAff+=2 : sumAff-=1;
+  firstMatch&&secondMatch&&thirdMatch ? sumAff+=3 : sumAff-=1; 
+  
+  int minLen=min(str1Len,str2Len);
+  memcmp(str1,str2,minLen) == 0 ? sumAff+=10 : sumAff-=1;
 
-  istringstream iss2(str2);
-  do{
-      string sub;
-      iss2 >> sub;
-      sub!="" && str1.find(sub)!=string::npos ? sumAff+=4:sumAff-=0;
-  } while (iss2);
+  str1Len==str2Len ? sumAff+=3 : sumAff-=0;
+  
+  const char* split = " ";
+  char *saveptr1,*saveptr2,*p;
+
+  p=strtok_r(str1,split,&saveptr1);
+  minLen=min(str2Len,(int)strlen(p));
+  memcmp(p,str2,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+  while(p!=NULL){
+     p=strtok_r(NULL,split,&saveptr1);
+     if(p!=NULL){
+        minLen=min(str2Len,(int)strlen(p));
+        memcmp(p,str2,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+     }
+  }
+ 
+  p=strtok_r(str2,split,&saveptr2);
+  minLen=min(str1Len,(int)strlen(p));
+  memcmp(p,str1,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+  while(p!=NULL){
+     p=strtok_r(NULL,split,&saveptr2);
+     if(p!=NULL){
+        minLen=min(str1Len,(int)strlen(p));
+        memcmp(p,str1,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+     }
+  }
+   
   return sumAff;
 }
 
@@ -58,40 +78,40 @@ int main ()
   mentions* mentionArray = new mentions[Nmen];
   entity* entityArray = new entity[Nmen];
   // Andrew MaCallum
-  mentionArray[0].token="Andrew McCallum";
-  mentionArray[1].token="Andrew MacCallum";
-  mentionArray[2].token="Angrew McCallum";
-  mentionArray[3].token="McCallum";
-  mentionArray[4].token="A. McCallum";
+  mentionArray[0].token=strdup("Andrew McCallum");
+  mentionArray[1].token=strdup("Andrew MacCallum");
+  mentionArray[2].token=strdup("Angrew McCallum");
+  mentionArray[3].token=strdup("McCallum");
+  mentionArray[4].token=strdup("A. McCallum");
   // Michael Wick
-  mentionArray[5].token="Michael Wick";
-  mentionArray[6].token="Mike Wick";
-  mentionArray[7].token="Michael Andrew Wick";
-  mentionArray[8].token="Wick";
-  mentionArray[9].token="Wick";
+  mentionArray[5].token=strdup("Michael Wick");
+  mentionArray[6].token=strdup("Mike Wick");
+  mentionArray[7].token=strdup("Michael Andrew Wick");
+  mentionArray[8].token=strdup("Wick");
+  mentionArray[9].token=strdup("Wick");
   // Khashayar Rohanemanesh
-  mentionArray[10].token="Khashayar Rohanemanesh";
-  mentionArray[11].token="Khash R.";
-  mentionArray[12].token="Kesh Rohanemanesh";
+  mentionArray[10].token=strdup("Khashayar Rohanemanesh");
+  mentionArray[11].token=strdup("Khash R.");
+  mentionArray[12].token=strdup("Kesh Rohanemanesh");
   // Aron Culotta
-  mentionArray[13].token="Aron Culotta";
-  mentionArray[14].token="Andrew Culotta";
-  mentionArray[15].token="A. Culotta";
-  mentionArray[16].token="Culotta McCallum";
-  mentionArray[17].token="Culotta";
-  mentionArray[18].token="Culotta";
+  mentionArray[13].token=strdup("Aron Culotta");
+  mentionArray[14].token=strdup("Andrew Culotta");
+  mentionArray[15].token=strdup("A. Culotta");
+  mentionArray[16].token=strdup("Culotta McCallum");
+  mentionArray[17].token=strdup("Culotta");
+  mentionArray[18].token=strdup("Culotta");
   // Charles Sutton
-  mentionArray[19].token="Charles Sutton";
-  mentionArray[20].token="Charles A. Sutton";
-  mentionArray[21].token="Sutton";
-  mentionArray[22].token="Sutton";
+  mentionArray[19].token=strdup("Charles Sutton");
+  mentionArray[20].token=strdup("Charles A. Sutton");
+  mentionArray[21].token=strdup("Sutton");
+  mentionArray[22].token=strdup("Sutton");
   // Nicola Cancceda
-  mentionArray[23].token="Nicola Cancceda";
-  mentionArray[24].token="Nicola Canceda";
-  mentionArray[25].token="Nicolla Cancceda";
-  mentionArray[26].token="Nicol Cancheta";
-  mentionArray[27].token="Canceda";
-  mentionArray[28].token="Cancceda";
+  mentionArray[23].token=strdup("Nicola Cancceda");
+  mentionArray[24].token=strdup("Nicola Canceda");
+  mentionArray[25].token=strdup("Nicolla Cancceda");
+  mentionArray[26].token=strdup("Nicol Cancheta");
+  mentionArray[27].token=strdup("Canceda");
+  mentionArray[28].token=strdup("Cancceda");
 
   for(i=0;i<Nmen;i++){
       mentionArray[i].entityId=i;
