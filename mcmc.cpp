@@ -11,7 +11,7 @@
 /* strlcpy based on OpenBSDs strlcpy */
 #include <sys/types.h>
 using namespace std;
-#define Nmen 29 // number of mentions
+#define Nmen 3 // number of mentions
 #define Niter 20000 // number of iterations
 struct mentions {
 	const char* token; // The actual string
@@ -128,7 +128,7 @@ int main ()
      exit(EXIT_FAILURE);
   }
   int mentionInter=0;
-  while(!namefile.eof() && mentionInter<=Nmen){
+  while(!namefile.eof() && mentionInter<Nmen){
      namefile >> input;
      string word;
      stringstream stream(input);
