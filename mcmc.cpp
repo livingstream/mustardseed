@@ -34,22 +34,27 @@ int affinity(mentions* mention1, mentions* mention2){
   string s2=str2;
   // match the the prefix with 1 character
   bool firstMatch = (str1[0]==str2[0]);
+  // match the the prefix with 2 character
   bool secondMatch = (str1[1]==str2[1]);
+  // match the the prefix with 3 character
   bool thirdMatch = (str1[2]==str2[2]);
   
   firstMatch ? sumAff+=1 : sumAff-=1;
   firstMatch&&secondMatch ? sumAff+=2 : sumAff-=1;
   firstMatch&&secondMatch&&thirdMatch ? sumAff+=3 : sumAff-=1; 
-  
-  str1Len==str2Len ? sumAff+=3 : sumAff-=0;
 
+  //have the same length  
+  str1Len==str2Len ? sumAff+=3 : sumAff-=0;
+  
+  //one string is a substring of the second string
   str1Len<=str2Len ? (s2.find(s1)!=string::npos ? sumAff+=10 : sumAff-=1) : (s1.find(s2)!=string::npos ? sumAff+=10 : sumAff-=1);
   
   const char* split=" ";
   char *saveptr1=NULL;
   char *saveptr2=NULL;
   char *p;
-
+  
+  //split string into tokens
   p=strtok_r(str1,split,&saveptr1);
   string sp=p;
   s2.find(sp)!=string::npos ? sumAff+=4 : sumAff-=0;
@@ -59,7 +64,8 @@ int affinity(mentions* mention1, mentions* mention2){
         s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
      }
   }
- 
+   
+  //split string into tokens
   p=strtok_r(str2,split,&saveptr2);
   sp=p;
   s1.find(sp)!=string::npos ? sumAff+=4 : sumAff-=0;
