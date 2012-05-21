@@ -102,49 +102,13 @@ int main ()
      while( getline(stream, word, ',') ){
         if(i==3){
            cout << word << "\n";
-           mentionArray[mentionInter]=strdup(word);
+           mentionArray[mentionInter]=word;
            mentionInter++; 
            break;
         }
         i++;
      }
   }
-  return 0;
-  // Andrew MaCallum
-  mentionArray[0].token=strdup("Andrew McCallum");
-  mentionArray[1].token=strdup("Andrew MacCallum");
-  mentionArray[2].token=strdup("Angrew McCallum");
-  mentionArray[3].token=strdup("McCallum");
-  mentionArray[4].token=strdup("A. McCallum");
-  // Michael Wick
-  mentionArray[5].token=strdup("Michael Wick");
-  mentionArray[6].token=strdup("Mike Wick");
-  mentionArray[7].token=strdup("Michael Andrew Wick");
-  mentionArray[8].token=strdup("Wick");
-  mentionArray[9].token=strdup("Wick");
-  // Khashayar Rohanemanesh
-  mentionArray[10].token=strdup("Khashayar Rohanemanesh");
-  mentionArray[11].token=strdup("Khash R.");
-  mentionArray[12].token=strdup("Kesh Rohanemanesh");
-  // Aron Culotta
-  mentionArray[13].token=strdup("Aron Culotta");
-  mentionArray[14].token=strdup("Andrew Culotta");
-  mentionArray[15].token=strdup("A. Culotta");
-  mentionArray[16].token=strdup("Culotta McCallum");
-  mentionArray[17].token=strdup("Culotta");
-  mentionArray[18].token=strdup("Culotta");
-  // Charles Sutton
-  mentionArray[19].token=strdup("Charles Sutton");
-  mentionArray[20].token=strdup("Charles A. Sutton");
-  mentionArray[21].token=strdup("Sutton");
-  mentionArray[22].token=strdup("Sutton");
-  // Nicola Cancceda
-  mentionArray[23].token=strdup("Nicola Cancceda");
-  mentionArray[24].token=strdup("Nicola Canceda");
-  mentionArray[25].token=strdup("Nicolla Cancceda");
-  mentionArray[26].token=strdup("Nicol Cancheta");
-  mentionArray[27].token=strdup("Canceda");
-  mentionArray[28].token=strdup("Cancceda");
 
   for(i=0;i<Nmen;i++){
       mentionArray[i].entityId=i;
