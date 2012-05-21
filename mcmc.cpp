@@ -32,15 +32,15 @@ int affinity(mentions* mention1, mentions* mention2){
   strlcpy(str2,mention2->token,str2Len);
   string s1=str1;
   string s2=str2;
-  // match the the prefix with 1 character
   bool firstMatch = (str1[0]==str2[0]);
-  // match the the prefix with 2 character
   bool secondMatch = (str1[1]==str2[1]);
-  // match the the prefix with 3 character
   bool thirdMatch = (str1[2]==str2[2]);
   
+  // match the the prefix with 1 character
   firstMatch ? sumAff+=1 : sumAff-=1;
+  // match the the prefix with 2 character
   firstMatch&&secondMatch ? sumAff+=2 : sumAff-=1;
+  // match the the prefix with 3 character
   firstMatch&&secondMatch&&thirdMatch ? sumAff+=3 : sumAff-=1; 
 
   //have the same length  
