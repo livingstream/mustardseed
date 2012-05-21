@@ -14,7 +14,7 @@
 /* strlcpy based on OpenBSDs strlcpy */
 #include <sys/types.h>
 using namespace std;
-#define Nmen 10000 // number of mentions
+#define Nmen 3000 // number of mentions
 #define Niter 20000 // number of iterations
 struct mentions {
 	char* token; // The actual string
