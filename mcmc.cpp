@@ -104,6 +104,8 @@ int main ()
         if(i==3){
            cout << word << "\n";
            mentionArray[mentionInter].token=word.c_str();
+           mentionArray[mentionInter].entityId=mentionInter;
+           entityArray[mentionInter].mentions.insert(mentionInter);
            mentionInter++; 
            break;
         }
@@ -111,10 +113,6 @@ int main ()
      }
   }
 
-  for(i=0;i<Nmen;i++){
-      mentionArray[i].entityId=i;
-      entityArray[i].mentions.insert(i);
-  }
   // calcualte the affinity score 
   for(i=0;i<Nmen;i++){
     for(j=0;j<Nmen;j++){
