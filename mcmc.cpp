@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <set>
 #include <ctime>
 #include <cstdlib>
@@ -9,7 +10,7 @@ using namespace std;
 #define Nmen 29 // number of mentions
 #define Niter 20000 // number of iterations
 struct mentions {
-	char* token; // The actual string
+	const char* token; // The actual string
 	int doc; // The identifier for the document (could be a string)
 	int para; // The number paragraph in the document
 	int word; // The number word in the pargraph
@@ -102,7 +103,7 @@ int main ()
      while( getline(stream, word, ',') ){
         if(i==3){
            cout << word << "\n";
-           mentionArray[mentionInter]=word;
+           mentionArray[mentionInter].token=word.c_str();
            mentionInter++; 
            break;
         }
