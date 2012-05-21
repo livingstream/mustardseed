@@ -2,19 +2,22 @@
 #include <sstream>
 #include <fstream>
 #include <cstring>
+#include <algorithm>
+#include <string>
 #include <set>
 #include <ctime>
 #include <cstdlib>
 #include <math.h>
 #include <vector>
 #include <stdio.h>
+#include <exception>
 /* strlcpy based on OpenBSDs strlcpy */
 #include <sys/types.h>
 using namespace std;
-#define Nmen 3 // number of mentions
+#define Nmen 10000 // number of mentions
 #define Niter 20000 // number of iterations
 struct mentions {
-	const char* token; // The actual string
+	char* token; // The actual string
 	int doc; // The identifier for the document (could be a string)
 	int para; // The number paragraph in the document
 	int word; // The number word in the pargraph
@@ -23,7 +26,7 @@ struct mentions {
 };
 struct entity {
 	int id; // An unique identifier for the entity (in consequential)
-        set<int>mentions; // all the mentions belong to the entity   
+        set<int> mentions; // all the mentions belong to the entity   
 };
 
 /*
@@ -32,28 +35,25 @@ struct entity {
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 size_t strlcpy(char *dst, const char *src, size_t siz){
-        char *d = dst;
-        const char *s = src;
-        size_t n = siz;
+	char *d = dst;
+	const char *s = src;
+	size_t n = siz;
 
-        /* Copy as many bytes as will fit */
-        if (n != 0 && --n != 0) {
-                do {
-                        if ((*d++ = *s++) == 0)
-                                break;
-                } while (--n != 0);
-        }
-        /* Not enough room in dst, add NUL and traverse rest of src */
-        if (n == 0) {
-                if (siz != 0)
-                        *d = '\0';                /* NUL-terminate dst */
-                while (*s++)
-                        ;
-        }
-        return(s - src - 1);        /* count does not include NUL */
+	/* Copy as many bytes as will fit */
+	if (n != 0 && --n != 0) {
+		do {
+	             if ((*d++ = *s++) == 0)
+		     break;
+		} while (--n != 0);
+	}
+	/* Not enough room in dst, add NUL and traverse rest of src */
+	if (n == 0) {
+           if (siz != 0)
+	       *d = '\0';                /* NUL-terminate dst */
+	   while (*s++);
+	}
+	return(s - src - 1);        /* count does not include NUL */
 }
-
-
 
 // affinity factor or features
 int affinity(mentions* mention1, mentions* mention2){
@@ -62,20 +62,26 @@ int affinity(mentions* mention1, mentions* mention2){
   char str2[50]="";
   int str1Len=strlen(mention1->token);
   int str2Len=strlen(mention2->token);
-  strlcpy(str1,mention1->token,str1Len);
-  strlcpy(str2,mention2->token,str2Len);
+  if(str1Len>49||str2Len>49){cout<<"exceed 50 chars, exit!<<endl";cin.get();}
+  strlcpy(str1,mention1->token,str1Len+1);
+  strlcpy(str2,mention2->token,str2Len+1);
   string s1=str1;
   string s2=str2;
-  bool firstMatch = (str1[0]==str2[0]);
-  bool secondMatch = (str1[1]==str2[1]);
-  bool thirdMatch = (str1[2]==str2[2]);
+
+  bool firstMatch=false;
+  bool secondMatch=false;
+  bool thirdMatch=false;
+
+  firstMatch = (str1[0]==str2[0]);
+  if(str1Len>=2&&str2Len>=2) secondMatch = (str1[1]==str2[1]);
+  if(str1Len>=3&&str2Len>=3) thirdMatch = (str1[2]==str2[2]);
   
   // match the the prefix with 1 character
   firstMatch ? sumAff+=1 : sumAff-=1;
   // match the the prefix with 2 character
   firstMatch&&secondMatch ? sumAff+=2 : sumAff-=1;
   // match the the prefix with 3 character
-  firstMatch&&secondMatch&&thirdMatch ? sumAff+=3 : sumAff-=1; 
+  firstMatch&&secondMatch&&thirdMatch ? sumAff+=3 : sumAff-=0; 
 
   //have the same length  
   str1Len==str2Len ? sumAff+=3 : sumAff-=0;
@@ -90,8 +96,8 @@ int affinity(mentions* mention1, mentions* mention2){
   
   //split string into tokens
   p=strtok_r(str1,split,&saveptr1);
-  string sp=p;
-  s2.find(sp)!=string::npos ? sumAff+=4 : sumAff-=0;
+  //string sp=p;
+  s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
   while(p!=NULL){
      p=strtok_r(NULL,split,&saveptr1);
      if(p!=NULL){
@@ -101,26 +107,28 @@ int affinity(mentions* mention1, mentions* mention2){
    
   //split string into tokens
   p=strtok_r(str2,split,&saveptr2);
-  sp=p;
-  s1.find(sp)!=string::npos ? sumAff+=4 : sumAff-=0;
+  //sp=p;
+  s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
   while(p!=NULL){
      p=strtok_r(NULL,split,&saveptr2);
      if(p!=NULL){
         s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
      }
   }
-
   return sumAff;
 }
 
 
+int affinityArray[Nmen][Nmen];
+mentions mentionArray[Nmen];
+entity entityArray[Nmen];
+
 int main ()
 {
   int i=0,j=0; int currentEntropy=1;
-  int affinityArray[Nmen][Nmen];
-  mentions* mentionArray = new mentions[Nmen];
-  entity* entityArray = new entity[Nmen];
-
+  //mentions * mentionArray = new mentions [Nmen];
+  //entity * entityArray = new entity [Nmen];
+  
   ifstream namefile("/home/kun/Desktop/nytmentionspy.csv");
   string input;
   if(!namefile.is_open()){
@@ -132,11 +140,12 @@ int main ()
      namefile >> input;
      string word;
      stringstream stream(input);
-     int i=0;
+     i=0;
      while( getline(stream, word, ',') ){
         if(i==3){
-           cout << word << "\n";
-           mentionArray[mentionInter].token=word.c_str();
+           transform(word.begin(),word.end(),word.begin(),::tolower);
+           mentionArray[mentionInter].token=new char[word.size()+1];
+           strcpy(mentionArray[mentionInter].token,word.c_str());
            mentionArray[mentionInter].entityId=mentionInter;
            entityArray[mentionInter].mentions.insert(mentionInter);
            mentionInter++; 
@@ -145,23 +154,26 @@ int main ()
         i++;
      }
   }
+  namefile.close();
 
   // calcualte the affinity score 
   for(i=0;i<Nmen;i++){
     for(j=0;j<Nmen;j++){
       if(j>i) {
-         cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t";
-         int score=affinity(&mentionArray[i],&mentionArray[j]);
+         int score=0;
+         score=affinity(&mentionArray[i],&mentionArray[j]);
          affinityArray[i][j]=score;
          affinityArray[j][i]=score;
-         cout<<score<<endl;
+         //if(score>1){
+         cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t"<<score<<endl;
+         //   return 0;
+         //}
       } else if (j==i){
          affinityArray[i][j]=0;
-         cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t"<<0<<endl;
+         //cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t"<<0<<endl;
       }
     }
   }
-  
   //propose a change 
   int iter=0;
   int randomMention=0;
@@ -223,13 +235,16 @@ int main ()
                }
        }
     }
-    //cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
+    cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
   }
   cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
   
-  for(i=0; i<Nmen; i++)
-     cout << "mention " <<i<< "	"<<mentionArray[i].entityId<<endl;
+  //for(i=0; i<Nmen; i++)
+  //   cout << "mention " <<i<< "	"<<mentionArray[i].entityId<<endl;
+   
+  for(i=0; i<Nmen; i++) delete[] mentionArray[i].token; 
   
   return 0;
+  
 }
