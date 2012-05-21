@@ -22,12 +22,16 @@ struct entity {
 };
 
 // affinity factor or features
-int affinity(mentions *mention1, mentions *mention2){
-  char* str1=mention1->token;
-  char* str2=mention2->token;
-  int str1Len=strlen(str1);
-  int str2Len=strlen(str2);
+int affinity(mentions* mention1, mentions* mention2){
   int sumAff=0;
+  char str1[50]="";
+  char str2[50]="";
+  int str1Len=strlen(mention1->token);
+  int str2Len=strlen(mention2->token);
+  strlcpy(str1,mention1->token,str1Len);
+  strlcpy(str2,mention2->token,str2Len);
+  string s1=str1;
+  string s2=str2;
   // match the the prefix with 1 character
   bool firstMatch = (str1[0]==str2[0]);
   bool secondMatch = (str1[1]==str2[1]);
@@ -37,10 +41,9 @@ int affinity(mentions *mention1, mentions *mention2){
   firstMatch&&secondMatch ? sumAff+=2 : sumAff-=1;
   firstMatch&&secondMatch&&thirdMatch ? sumAff+=3 : sumAff-=1; 
   
-  int minLen=min(str1Len,str2Len);
-  memcmp(str1,str2,minLen) == 0 ? sumAff+=10 : sumAff-=1;
-
   str1Len==str2Len ? sumAff+=3 : sumAff-=0;
+
+  str1Len<=str2Len ? (s2.find(s1)!=string::npos ? sumAff+=10 : sumAff-=1) : (s1.find(s2)!=string::npos ? sumAff+=10 : sumAff-=1);
   
   const char* split=" ";
   char *saveptr1=NULL;
@@ -48,27 +51,25 @@ int affinity(mentions *mention1, mentions *mention2){
   char *p;
 
   p=strtok_r(str1,split,&saveptr1);
-  minLen=min(str2Len,(int)strlen(p));
-  memcmp(p,str2,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+  string sp=p;
+  s2.find(sp)!=string::npos ? sumAff+=4 : sumAff-=0;
   while(p!=NULL){
      p=strtok_r(NULL,split,&saveptr1);
      if(p!=NULL){
-        minLen=min(str2Len,(int)strlen(p));
-        memcmp(p,str2,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+        s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
      }
   }
  
   p=strtok_r(str2,split,&saveptr2);
-  minLen=min(str1Len,(int)strlen(p));
-  memcmp(p,str1,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+  sp=p;
+  s1.find(sp)!=string::npos ? sumAff+=4 : sumAff-=0;
   while(p!=NULL){
      p=strtok_r(NULL,split,&saveptr2);
      if(p!=NULL){
-        minLen=min(str1Len,(int)strlen(p));
-        memcmp(p,str1,minLen) == 0 ? sumAff+=4 : sumAff-=0;
+        s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
      }
   }
-   
+
   return sumAff;
 }
 
@@ -123,12 +124,14 @@ int main ()
   for(i=0;i<Nmen;i++){
     for(j=0;j<Nmen;j++){
       if(j>i) {
+         cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t";
          int score=affinity(&mentionArray[i],&mentionArray[j]);
          affinityArray[i][j]=score;
          affinityArray[j][i]=score;
-         //cout<<mentionArray[i].token<<" "<<mentionArray[j].token<<" "<<score<<endl;
+         cout<<score<<endl;
       } else if (j==i){
-          affinityArray[i][j]=0;
+         affinityArray[i][j]=0;
+         cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t"<<0<<endl;
       }
     }
   }
@@ -194,13 +197,13 @@ int main ()
                }
        }
     }
-    cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
+    //cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
   }
   cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
   
   for(i=0; i<Nmen; i++)
-     cout << "mention " << i<< "	"<<mentionArray[i].entityId<<endl;
+     cout << "mention " <<i<< "	"<<mentionArray[i].entityId<<endl;
   
   return 0;
 }
