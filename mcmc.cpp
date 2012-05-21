@@ -86,6 +86,30 @@ int main ()
   int affinityArray[Nmen][Nmen];
   mentions* mentionArray = new mentions[Nmen];
   entity* entityArray = new entity[Nmen];
+
+  ifstream namefile("/home/kun/Desktop/nytmentionspy.csv");
+  string input;
+  if(!namefile.is_open()){
+     cerr << "Error opening file";
+     exit(EXIT_FAILURE);
+  }
+  int mentionInter=0;
+  while(!namefile.eof() && mentionInter<=Nmen){
+     namefile >> input;
+     string word;
+     stringstream stream(input);
+     int i=0;
+     while( getline(stream, word, ',') ){
+        if(i==3){
+           cout << word << "\n";
+           mentionArray[mentionInter]=strdup(word);
+           mentionInter++; 
+           break;
+        }
+        i++;
+     }
+  }
+  return 0;
   // Andrew MaCallum
   mentionArray[0].token=strdup("Andrew McCallum");
   mentionArray[1].token=strdup("Andrew MacCallum");
