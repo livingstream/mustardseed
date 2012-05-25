@@ -93,14 +93,14 @@ for i in range(0,437):
        else: 
              testdead=testdead+1
              testingf.write(str(testdead+testalive) + "\t1\t{" + ",".join(feature[i][1:]) + "}\n");
-    elif feature[i][0]=='0':
-       alive=alive+1
-       if alive<=162:
-             trainalive=trainalive+1
-             trainf.write(str(traindead+trainalive) + "\t2\t{" + ",".join(feature[i][1:]) + "}\n")
-       else:
-             testalive=testalive+1
-             testingf.write(str(testdead+testalive) + "\t2\t{" + ",".join(feature[i][1:]) + "}\n");
+    elif feature[i][0]=='2':
+         alive=alive+1
+         if alive<=162:
+              trainalive=trainalive+1
+              trainf.write(str(traindead+trainalive) + "\t2\t{" + ",".join(feature[i][1:]) + "}\n")
+         else:
+              testalive=testalive+1
+              testingf.write(str(testdead+testalive) + "\t2\t{" + ",".join(feature[i][1:]) + "}\n");
     else:
          break
          print "error!"
