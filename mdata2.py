@@ -17,7 +17,7 @@ dic=[]
 cnt = Counter()
 deathf=[]
 alivef=[]
-textTraindata=[]
+traindata=[]
 desTraindata=[]
 for i in range(2,439):
         value=((sheetfinal.cell('E'+str(i)).value).lower()).strip()
@@ -45,14 +45,14 @@ for i in range(2,439):
         cnt=Counter()
         #class label
         if value=="yes":
-           feature[fileinter-1][0]="1"
-        else value=="no":
-           feature[fileinter-1][0]="2"
+             feature[fileinter-1][0]="1"
+        elif value=="no":
+             feature[fileinter-1][0]="2"
         #text token feature
         for word in re.findall(r'\w+',text):
             cnt[word]+=1
         for dicword in dic:
-            featureInter++
+            featureInter=featureInter+1
             if dicword in cnt:
                feature[fileinter-1][featureInter]="1"
             else:
@@ -76,21 +76,31 @@ for i in range(2,439):
         featureInter=featureInter+1
         cci=(sheetfinal.cell('K'+str(i)).value.lower()).strip()
         feature[fileInter-1][featureInter]=cci
- 
-for i in range(0,225):
-    if i<175:
-             textTraindata.append(str(i) + "\t1\t{" + ",".join(feature[i]) + "}\n");
-             #trainingf.write(str(i) + "\t1\t{" + ",".join(feature[i]) + "}\n");
-    else:
-             testingf.write(str(i-175) + "\t1\t{" + ",".join(feature[i]) + "}\n");
 
-for i in range(0,212):
-    if i<162:
-             textTraindata.append(str(i+175) + "\t2\t{" + ",".join(feature[i+225]) + "}\n")
-             #trainingf.write(str(i+175) + "\t2\t{" + ",".join(feature[i+225]) + "}\n");
+dead=0
+traindead=0
+testdead=0
+alive=0 
+trainalive=0
+testalive=0
+
+for i in range(0,437):
+    if feature[i][0]=='1':
+       dead=dead+1
+       if dead<=175:
+             traindead=traindead+1
+             trainf.write(str(traindead+trainalive) + "\t1\t{" + ",".join(feature[i][1:]) + "}\n");
+       else: 
+             testdead=testdead+1
+             testingf.write(str(testdead+testalive) + "\t1\t{" + ",".join(feature[i][1:]) + "}\n");
+    elif feature[i][0]=='0':
+       alive=alive+1
+       if alive<=162:
+             trainalive=trainalive+1
+             trainf.write(str(traindead+trainalive) + "\t2\t{" + ",".join(feature[i][1:]) + "}\n")
+       else:
+             testalive=testalive+1
+             testingf.write(str(testdead+testalive) + "\t2\t{" + ",".join(feature[i][1:]) + "}\n");
     else:
-             testingf.write(str(i-162+50) + "\t2\t{" + ",".join(feature[i+225]) + "}\n");
-#write traning data into file
-random.shuffle(textTraindata)
-for i in range(0,175+162):
-    trainingf.write(textTraindata[i]);
+         break
+         print "error!"
