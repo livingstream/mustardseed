@@ -75,7 +75,7 @@ for i in range(2,439):
         #cci feature
         featureInter=featureInter+1
         cci=(sheetfinal.cell('K'+str(i)).value.lower()).strip()
-        feature[fileInter-1][featureInter]=age
+        feature[fileInter-1][featureInter]=cci
  
 for i in range(0,225):
     if i<175:
