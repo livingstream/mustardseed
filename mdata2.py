@@ -41,8 +41,7 @@ for i in range(2,439):
         fileinter=fileinter+1
         featureInter=0
         value=((sheetfinal.cell('E'+str(i)).value).lower()).strip()
-        text=sheetfinal.cell('J'+str(i)).value+sheetfinal.cell('K'+str(i)).value+sheetfinal.cell('L'+str(i)).value
-        text=text.strip().lower()
+        text=(sheetfinal.cell('S'+str(i)).value+sheetfinal.cell('T'+str(i)).value).strip().lower()
         cnt=Counter()
         #class label
         if value=="yes":
