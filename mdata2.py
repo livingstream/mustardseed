@@ -103,5 +103,5 @@ for i in range(0,437):
               testalive=testalive+1
               testingf.write(str(testdead+testalive) + "\t2\t{" + ",".join(feature[i][1:]) + "}\n");
     else:
-         break
          print "error!"
+         break
