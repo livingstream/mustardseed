@@ -11,112 +11,17 @@
 #include <vector>
 #include <stdio.h>
 #include <exception>
+#include "mcmc.h"
+#include "pairwisef.h"
+#include "mcmclib.cpp"
 /* strlcpy based on OpenBSDs strlcpy */
 #include <sys/types.h>
 using namespace std;
 #define Nmen 3000 // number of mentions
 #define Niter 20000 // number of iterations
-struct mentions {
-	char* token; // The actual string
-	int doc; // The identifier for the document (could be a string)
-	int para; // The number paragraph in the document
-	int word; // The number word in the pargraph
-	int pos; // Integer identifier for the part of speech
-        int entityId; // entity the mention belongs to
-};
-struct entity {
-	int id; // An unique identifier for the entity (in consequential)
-        set<int> mentions; // all the mentions belong to the entity   
-};
-
-/*
- * Copy src to string dst of size siz.  At most siz-1 characters
- * will be copied.  Always NUL terminates (unless siz == 0).
- * Returns strlen(src); if retval >= siz, truncation occurred.
- */
-size_t strlcpy(char *dst, const char *src, size_t siz){
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
-
-	/* Copy as many bytes as will fit */
-	if (n != 0 && --n != 0) {
-		do {
-	             if ((*d++ = *s++) == 0)
-		     break;
-		} while (--n != 0);
-	}
-	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0) {
-           if (siz != 0)
-	       *d = '\0';                /* NUL-terminate dst */
-	   while (*s++);
-	}
-	return(s - src - 1);        /* count does not include NUL */
-}
-
-// affinity factor or features
-int affinity(mentions* mention1, mentions* mention2){
-  int sumAff=0;
-  char str1[50]="";
-  char str2[50]="";
-  int str1Len=strlen(mention1->token);
-  int str2Len=strlen(mention2->token);
-  if(str1Len>49||str2Len>49){cout<<"exceed 50 chars, exit!<<endl";cin.get();}
-  strlcpy(str1,mention1->token,str1Len+1);
-  strlcpy(str2,mention2->token,str2Len+1);
-  string s1=str1;
-  string s2=str2;
-
-  bool firstMatch=false;
-  bool secondMatch=false;
-  bool thirdMatch=false;
-
-  firstMatch = (str1[0]==str2[0]);
-  if(str1Len>=2&&str2Len>=2) secondMatch = (str1[1]==str2[1]);
-  if(str1Len>=3&&str2Len>=3) thirdMatch = (str1[2]==str2[2]);
-  
-  // match the the prefix with 1 character
-  firstMatch ? sumAff+=1 : sumAff-=1;
-  // match the the prefix with 2 character
-  firstMatch&&secondMatch ? sumAff+=2 : sumAff-=1;
-  // match the the prefix with 3 character
-  firstMatch&&secondMatch&&thirdMatch ? sumAff+=3 : sumAff-=0; 
-
-  //have the same length  
-  str1Len==str2Len ? sumAff+=3 : sumAff-=0;
-  
-  //one string is a substring of the second string
-  str1Len<=str2Len ? (s2.find(s1)!=string::npos ? sumAff+=10 : sumAff-=1) : (s1.find(s2)!=string::npos ? sumAff+=10 : sumAff-=1);
-  
-  const char* split=" ";
-  char *saveptr1=NULL;
-  char *saveptr2=NULL;
-  char *p;
-  
-  //split string into tokens
-  p=strtok_r(str1,split,&saveptr1);
-  //string sp=p;
-  s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-  while(p!=NULL){
-     p=strtok_r(NULL,split,&saveptr1);
-     if(p!=NULL){
-        s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-     }
-  }
-   
-  //split string into tokens
-  p=strtok_r(str2,split,&saveptr2);
-  //sp=p;
-  s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-  while(p!=NULL){
-     p=strtok_r(NULL,split,&saveptr2);
-     if(p!=NULL){
-        s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-     }
-  }
-  return sumAff;
-}
+#define bias 0 // affinity score and replusion score bais
+#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+size_t strlcpy(char *dst, const char *src, size_t siz);
 
 
 int affinityArray[Nmen][Nmen];
@@ -125,11 +30,9 @@ entity entityArray[Nmen];
 
 int main ()
 {
-  int i=0,j=0; int currentEntropy=1;
-  //mentions * mentionArray = new mentions [Nmen];
-  //entity * entityArray = new entity [Nmen];
-  
-  ifstream namefile("/home/kun/Desktop/nytmentionspy.csv");
+  int i=0,j=0,currentEntropy=1;
+  // read data from nyt dataset 
+  ifstream namefile(nytdatapath);
   string input;
   if(!namefile.is_open()){
      cerr << "Error opening file";
@@ -142,12 +45,20 @@ int main ()
      stringstream stream(input);
      i=0;
      while( getline(stream, word, ',') ){
-        if(i==3){
+        if(i==0)//extract the integer docid from string
+           mentionArray[mentionInter].doc=atoi(word.substr(8,16)+word.substr(17,21));
+        else if(i==1)
+           mentionArray[mentionInter].para=atoi(word);
+        else if(i==2)
+           mentionArray[mentionInter].word=atoi(word);
+        else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
-           mentionArray[mentionInter].token=new char[word.size()+1];
+           int word_len = word.size();
+           mentionArray[mentionInter].token=new char[word_len+1];
+           mentionArray[mentionInter].length=word_len;
            strcpy(mentionArray[mentionInter].token,word.c_str());
            mentionArray[mentionInter].entityId=mentionInter;
-           entityArray[mentionInter].mentions.insert(mentionInter);
+           entityArray[mentionInter].mentionSet.insert(mentionInter);
            mentionInter++; 
            break;
         }
@@ -185,13 +96,13 @@ int main ()
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     randomEntity=-1;
-    if(entityArray[mentionArray[randomMention].entityId].mentions.size()==1||
+    if(entityArray[mentionArray[randomMention].entityId].mentionSet.size()==1||
        ((double)rand()/(double)RAND_MAX)<=0.8){
        randomEntity=rand()%Nmen;
     } else{ // place it in an empty or create a new entity TODO create a new entity
       vector<int>emptyEntityVector;
       for(i=0;i<Nmen;i++){
-          if(entityArray[i].mentions.size()==0){
+          if(entityArray[i].mentionSet.size()==0){
              emptyEntityVector.push_back(i);
           }
       }
@@ -204,21 +115,21 @@ int main ()
     if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
        set<int>::iterator it;
        int loss=0;
-       for(it=entityArray[mentionArray[randomMention].entityId].mentions.begin();it!=
-           entityArray[mentionArray[randomMention].entityId].mentions.end();++it){
+       for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
+           entityArray[mentionArray[randomMention].entityId].mentionSet.end();++it){
            loss+=affinityArray[randomMention][*it];
        }
        int gain=0;
-       for(it=entityArray[randomEntity].mentions.begin();it!=
-           entityArray[randomEntity].mentions.end();++it){
+       for(it=entityArray[randomEntity].mentionSet.begin();it!=
+           entityArray[randomEntity].mentionSet.end();++it){
            gain+=affinityArray[randomMention][*it];
        }
        //accept or not
        if(gain>loss){// we should accept it
           accepted+=1;
           //remove the mention from old entity and place it into the new entity
-          entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
-          entityArray[randomEntity].mentions.insert(randomMention);
+          entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
+          entityArray[randomEntity].mentionSet.insert(randomMention);
           mentionArray[randomMention].entityId=randomEntity;
           currentEntropy=currentEntropy+gain-loss;
        } else {// accept it with a probablity
@@ -228,8 +139,8 @@ int main ()
                if(ratio>p){// accept it
                   accepted+=1;
                   //remove the mention from old entity and place it into the new entity
-                  entityArray[mentionArray[randomMention].entityId].mentions.erase(randomMention);
-                  entityArray[randomEntity].mentions.insert(randomMention);
+                  entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
+                  entityArray[randomEntity].mentionSet.insert(randomMention);
                   mentionArray[randomMention].entityId=randomEntity;
                   currentEntropy=currentEntropy+gain-loss;
                }
