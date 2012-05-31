@@ -4,7 +4,7 @@
 #include <cstring>
 #include <algorithm>
 #include <string>
-#include <set>
+#include <map>
 #include <ctime>
 #include <cstdlib>
 #include <math.h>
@@ -31,6 +31,7 @@ entity entityArray[Nmen];
 int main ()
 {
   int i=0,j=0,currentEntropy=1;
+  map<string,int>literalMap;
   // read data from nyt dataset 
   ifstream namefile(nytdatapath);
   string input;
@@ -54,17 +55,25 @@ int main ()
         else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
            int word_len = word.size();
-           mentionArray[mentionInter].token=new char[word_len+1];
-           mentionArray[mentionInter].length=word_len;
+           mentionArray[mentionInter].token=new char[word_len+1];//assign the token
+           mentionArray[mentionInter].length=word_len;//assgin length
+           int dest_entity=0;
+           if(literalMap.count(word)==0){
+             dest_entity=literalMap.size();
+             literalMap.insert(pair<string,int>(word,dest_entity)); 
+           } else {
+             dest_entity=literalMap.find(word)->second;
+           }
+           //update entity and mention
+           mentionArray[mentionInter].entityId=dest_entity;
+           entityArray[dest_entity].mentionSet.insert(mentionInter);
            strcpy(mentionArray[mentionInter].token,word.c_str());
-           mentionArray[mentionInter].entityId=mentionInter;
-           entityArray[mentionInter].mentionSet.insert(mentionInter);
-           mentionInter++; 
-           break;
         }
         i++;
      }
+     mentionInter++;
   }
+
   namefile.close();
 
   // calcualte the affinity score 
