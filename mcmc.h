@@ -1,6 +1,8 @@
 #include <iostream>
 #include <set>
-
+#include "pariwiseF.h"
+#include "clusterF.h"
+using namespace std;
 struct mentions {
         char* token; // The actual string
         int length;
