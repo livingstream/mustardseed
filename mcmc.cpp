@@ -15,14 +15,12 @@
 #include "pairwisef.h"
 #include "clusterf.h"
 #include "mcmclib.cpp"
-/* strlcpy based on OpenBSDs strlcpy */
-//#include <sys/types.h>
 using namespace std;
 #define Nmen 3000 // number of mentions
 #define Niter 20000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
 #define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
-//size_t strlcpy(char *dst, const char *src, size_t siz);
+size_t strlcpy(char *dst, const char *src, size_t siz);
 
 int affinityArray[Nmen][Nmen];
 mentions mentionArray[Nmen];
