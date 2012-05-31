@@ -52,9 +52,7 @@ int main ()
            mentionArray[mentionInter].word=atoi(word);
         else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
-           int word_len = word.size();
-           mentionArray[mentionInter].token=new char[word_len+1];//assign the token
-           mentionArray[mentionInter].length=word_len;//assgin length
+           mentionArray[mentionInter].length=word.size();//assgin length
            int dest_entity=0;
            if(literalMap.count(word)==0){
              dest_entity=literalMap.size();
@@ -161,8 +159,6 @@ int main ()
   //for(i=0; i<Nmen; i++)
   //   cout << "mention " <<i<< "	"<<mentionArray[i].entityId<<endl;
    
-  for(i=0; i<Nmen; i++) delete[] mentionArray[i].token; 
-  
   return 0;
   
 }
