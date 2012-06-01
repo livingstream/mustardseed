@@ -12,8 +12,6 @@
 #include <stdio.h>
 #include <exception>
 #include "mcmc.h"
-#include "pairwisef.h"
-#include "clusterf.h"
 #include "mcmclib.cpp"
 using namespace std;
 #define Nmen 3000 // number of mentions
@@ -23,7 +21,7 @@ using namespace std;
 size_t strlcpy(char *dst, const char *src, size_t siz);
 
 int affinityArray[Nmen][Nmen];
-mentions mentionArray[Nmen];
+mention mentionArray[Nmen];
 entity entityArray[Nmen];
 
 int main ()
@@ -52,7 +50,7 @@ int main ()
            mentionArray[mentionInter].word=atoi(word);
         else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
-           mentionArray[mentionInter].length=word.size();//assgin length
+           mentionArray[mentionInter].len=word.size();//assgin length
            int dest_entity=0;
            if(literalMap.count(word)==0){
              dest_entity=literalMap.size();
@@ -72,24 +70,6 @@ int main ()
 
   namefile.close();
 
-  // calcualte the affinity score 
-  for(i=0;i<Nmen;i++){
-    for(j=0;j<Nmen;j++){
-      if(j>i) {
-         int score=0;
-         score=affinity(&mentionArray[i],&mentionArray[j]);
-         affinityArray[i][j]=score;
-         affinityArray[j][i]=score;
-         //if(score>1){
-         cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t"<<score<<endl;
-         //   return 0;
-         //}
-      } else if (j==i){
-         affinityArray[i][j]=0;
-         //cout<<mentionArray[i].token<<"\t"<<mentionArray[j].token<<"\t"<<0<<endl;
-      }
-    }
-  }
   //propose a change 
   int iter=0;
   int randomMention=0;
@@ -122,12 +102,12 @@ int main ()
        int loss=0;
        for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
            entityArray[mentionArray[randomMention].entityId].mentionSet.end();++it){
-           loss+=affinityArray[randomMention][*it];
+           loss+=mentionArray[randomMention].pairwiseScore(mentionArray[*it]);
        }
        int gain=0;
        for(it=entityArray[randomEntity].mentionSet.begin();it!=
            entityArray[randomEntity].mentionSet.end();++it){
-           gain+=affinityArray[randomMention][*it];
+           gain+=mentionArray[randomMention].pairwiseScore(mentionArray[*it]);
        }
        //accept or not
        if(gain>loss){// we should accept it
