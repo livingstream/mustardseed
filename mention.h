@@ -39,44 +39,44 @@ class prefixFeature {
             return this->firstC==other.firstC ? (1+(this->secondC==other.secondC ? ((this->thirdC==other.thirdC ? 3 : 0)+2) : -1)): -1
           }
 }
+
 class substrFeature {
 	public:
-          int substrScore(substrFeature& other){
-  int sumAff=0;
-  char charArray1[50]="",charArray2[50]="";
-  strlcpy(charArray1,this->token,this->len+1);
-  strlcpy(charArray2,other.token,other.len+1);
-
-  string s1=charArray1;
-  string s2=charArray2;
-
-  //one string is a substring of the second string
-  this->len<=other.len ? (s2.find(s1)!=string::npos ? sumAff+=10 : sumAff-=1) : 
-                        (s1.find(s2)!=string::npos ? sumAff+=10 : sumAff-=1);
-	    const char* split=" ";
-	    char *saveptr1=NULL,*saveptr2=NULL,*p;
-	    //split string into tokens
-	    p=strtok_r(s1,split,&saveptr1);
-	    //string sp=p;
-	    s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-	    while(p!=NULL){
-	       	p=strtok_r(NULL,split,&saveptr1);
-		if(p!=NULL){
-			s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-		}
-	    }
-	    //split string into tokens
-	    p=strtok_r(s2,split,&saveptr2);
-	    //sp=p;
-	    s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-	    while(p!=NULL){
-	    	p=strtok_r(NULL,split,&saveptr2);
-	  	if(p!=NULL){
-			s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-		}
-	    }
-        }
+          char tokenArray[5][50];
+          char stringL[50];
+          int len;
+          int token_size;
+	  substrFeature(char* stringL, char** token, int size){
+            this->stringL=stringL;
+	    this->tokenArray=token;
+	    this->token_size=size;
+          }
+	  int substrScore(substrFeature& other){
+	      //one string is a substring of the second string
+              int sum=this->len>=other.len ? (strstr(*stringL,other.stringL)==NULL ? -1 : 10) : (strstr(*stringL,other.stringL)==NULL ? -1 : 10);
+              
+	      p=strtok_r(s1,split,&saveptr1);
+	      //string sp=p;
+	      s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
+	      while(p!=NULL){
+		p=strtok_r(NULL,split,&saveptr1);
+			if(p!=NULL){
+				s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
+			}
+	      }
+	      //split string into tokens
+	      p=strtok_r(s2,split,&saveptr2);
+	      //sp=p;
+	      s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
+	      while(p!=NULL){
+			p=strtok_r(NULL,split,&saveptr2);
+			if(p!=NULL){
+				s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
+			}
+	      }
+	}
 }
+
 class lengthFeature {
        public: 
 	int length;
