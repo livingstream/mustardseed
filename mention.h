@@ -3,6 +3,21 @@
 using namespace std;
 size_t strlcpy(char *dst, const char *src, size_t siz);
 
+class prefixFeature {
+	public:
+          char firstC;
+          char secondC;
+          char thirdC;
+          prefixFeature(char first, char second, char third){
+            firstC=first;
+            secondC=second;
+            thirdC=third;
+          }
+          int prefixScore(prefixFeature& other){
+            return this->firstC==other.firstC ? (1+(this->secondC==other.secondC ? ((this->thirdC==other.thirdC ? 3 : 0)+2) : -1)): -1
+          }
+}
+
 class mention {
       public:
         char token[50]; // The actual string
@@ -24,21 +39,10 @@ class mention {
            this->pos=pos_id;
            this->entityId=entity_id;
         }
+        int pairwiseScore(mention& other){
+	  return prefixf.prefixScore(other.prefixf)+substrf.substrScore(other.substrf)+lengthf.lengthScore(other.lengthf);
+        }
 };
-class prefixFeature {
-	public:
-          char firstC;
-          char secondC;
-          char thirdC;
-          prefixFeature(char first, char second, char third){
-            firstC=first;
-            secondC=second;
-            thirdC=third;
-          }
-          int prefixScore(prefixFeature& other){
-            return this->firstC==other.firstC ? (1+(this->secondC==other.secondC ? ((this->thirdC==other.thirdC ? 3 : 0)+2) : -1)): -1
-          }
-}
 
 class substrFeature {
 	public:
