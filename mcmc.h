@@ -12,9 +12,34 @@ class mention {
         int word; // The number word in the pargraph
         int pos; // Integer identifier for the part of speech
         int entityId; // entity the mention belongs to
+        prefixFeature prefixf;
+        mention(char[],int,int,int,int,int,int);
         int pairwiseScore(mention &);
         
 };
+mention::mention(char[] stringL, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
+        this->token=stringL;
+        this->len=length;
+        this->doc=doc_id;
+        this->para=para_id;
+        this->word=word_id;
+        this->pos=pos_id;
+        this->entityId=entity_id;
+}
+class prefixFeature {
+	public:
+          char firstC;
+          char secondC;
+          char thirdC;
+          prefixFeature(char first, char second, char third){
+            firstC=first;
+            secondC=second;
+            thirdC=third;
+          }
+          int prefixScore(prefixFeature& other){
+            return this->firstC==other.firstC ? (1+(this->secondC==other.secondC ? ((this->thirdC==other.thirdC ? 3 : 0)+2) : -1)): -1
+          }
+}
 int mention::pairwiseScore(mention & other){
   int sumAff=0;
   char charArray1[50]="",charArray2[50]="";
@@ -23,18 +48,6 @@ int mention::pairwiseScore(mention & other){
 
   string s1=charArray1;
   string s2=charArray2;
-  bool firstMatch=false, secondMatch=false, thirdMatch=false;
-
-  firstMatch =  (this->token[0]==other.token[0]);
-  secondMatch = (this->token[1]==other.token[1]);
-  thirdMatch =  (this->token[2]==other.token[2]);
-
-  // match the the prefix with 1 character
-  firstMatch ? sumAff+=1 : sumAff-=1;
-  // match the the prefix with 2 character
-  firstMatch&secondMatch ? sumAff+=2 : sumAff-=1;
-  // match the the prefix with 3 character
-  firstMatch&secondMatch&thirdMatch ? sumAff+=3 : sumAff-=0;
   //have the same length  
   this->len==other.len ? sumAff+=3 : sumAff-=0;
 
