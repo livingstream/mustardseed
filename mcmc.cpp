@@ -11,7 +11,8 @@
 #include <vector>
 #include <stdio.h>
 #include <exception>
-#include "mcmc.h"
+#include "mention.h"
+#include "entity.h"
 #include "mcmclib.cpp"
 using namespace std;
 #define Nmen 3000 // number of mentions
@@ -43,11 +44,11 @@ int main ()
      i=0;
      while( getline(stream, word, ',') ){
         if(i==0)//extract the integer docid from string
-           mentionArray[mentionInter].doc=atoi(word.substr(8,16)+word.substr(17,21));
+           mentionArray[mentionInter].doc=atoi((word.substr(8,16)+word.substr(17,21)).c_str());
         else if(i==1)
-           mentionArray[mentionInter].para=atoi(word);
+           mentionArray[mentionInter].para=atoi(word.c_str());
         else if(i==2)
-           mentionArray[mentionInter].word=atoi(word);
+           mentionArray[mentionInter].word=atoi(word.c_str());
         else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
            mentionArray[mentionInter].len=word.size();//assgin length
