@@ -52,29 +52,17 @@ class substrFeature {
 	    this->token_size=size;
           }
 	  int substrScore(substrFeature& other){
+              int i=0;
 	      //one string is a substring of the second string
-              int sum=this->len>=other.len ? (strstr(*stringL,other.stringL)==NULL ? -1 : 10) : (strstr(*stringL,other.stringL)==NULL ? -1 : 10);
-              
-	      p=strtok_r(s1,split,&saveptr1);
-	      //string sp=p;
-	      s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-	      while(p!=NULL){
-		p=strtok_r(NULL,split,&saveptr1);
-			if(p!=NULL){
-				s2.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-			}
-	      }
-	      //split string into tokens
-	      p=strtok_r(s2,split,&saveptr2);
-	      //sp=p;
-	      s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-	      while(p!=NULL){
-			p=strtok_r(NULL,split,&saveptr2);
-			if(p!=NULL){
-				s1.find(p)!=string::npos ? sumAff+=4 : sumAff-=0;
-			}
-	      }
-	}
+              int sum=this->len>=other.len ? (strstr(*stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,*stringL)==NULL ? -1 : 10);
+              for (i=0;i<this->token_size;i++){
+              	sum+=tokenArray[i]->len>=other.len ? (strstr(*tokenArray[i],other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,*tokenArray[i])==NULL ? -1 : 10);
+              } 
+              for (i=0;i<other.token_size;i++){
+              sum+=this->len>=other.tokenArray[i] ? (strstr(this->stringL,other.tokenArray[i])==NULL?-1:10) : (strstr(other.tokenArray[i],this->stringL)==NULL? -1 : 10);
+              } 
+              return sum;
+	  }
 }
 
 class lengthFeature {
