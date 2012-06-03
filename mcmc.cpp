@@ -42,7 +42,6 @@ int main ()
      int i=0, doc_id, para_id, word_num, str_len, dest_entity;
      char tmpS[50];
      while( getline(stream, word, ',') ){
-        int doc_id, para_id, word_num, str_len, dest_entity;
         if(i==0)//extract the integer docid from string
            doc_id=atoi((word.substr(8,16)+word.substr(17,21)).c_str());
         else if(i==1)
