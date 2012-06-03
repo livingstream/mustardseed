@@ -69,7 +69,7 @@ int main ()
   }
 
   namefile.close();
-
+  return 0;
   //propose a change 
   int iter=0;
   int randomMention=0;
