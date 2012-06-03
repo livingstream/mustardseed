@@ -19,7 +19,6 @@ using namespace std;
 #define Niter 20000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
 #define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
-size_t strlcpy(char *dst, const char *src, size_t siz);
 
 entity entityArray[Nmen];
 mention mentionArray[Nmen];
