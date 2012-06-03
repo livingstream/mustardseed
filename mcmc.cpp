@@ -43,7 +43,7 @@ int main ()
      char tmpS[50];
      while( getline(stream, word, ',') ){
         if(i==0)//extract the integer docid from string
-           doc_id=atoi((word.substr(8,16)+word.substr(17,21)).c_str());
+           doc_id=atoi(word.substr(8,16).c_str())*10000+atoi(word.substr(17,21).c_str());
         else if(i==1)
            para_id=atoi(word.c_str());
         else if(i==2)
