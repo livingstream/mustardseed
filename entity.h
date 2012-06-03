@@ -20,7 +20,7 @@ class clusterPrefixF {
                 if(prefix[char_ascii]==0) prefixSet.erase(char_ascii);
           }
           int clusterPrefixScore(){
-		return prefixSet.size==1 ? clusterPrefixW : 0;	
+		return prefixSet.size()==1 ? clusterPrefixW : 0;	
           }
 };
 
@@ -30,7 +30,7 @@ class clusterSameDocF {
           void add(int doc_id){
 	    docMap[doc_id]=docMap[doc_id]+1;
           }
-	  void delete(int doc_id){
+	  void remove(int doc_id){
             docMap[doc_id]=docMap[doc_id]-1;
             if(docMap[doc_id]==0) docMap.erase(doc_id);
           }
@@ -46,6 +46,6 @@ class entity {
         clusterPrefixF clusterPrefixf;
         clusterSameDocF clusterSameDocf;
         int clusterScore(){
-	   return clusterPrefixf.clusterPrefixScore()+clusterSameDoc.clusterSameDocScore();         
+	   return clusterPrefixf.clusterPrefixScore()+clusterSameDocf.clusterSameDocScore();         
         }
 };
