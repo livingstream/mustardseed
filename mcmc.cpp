@@ -80,7 +80,7 @@ int main ()
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     randomEntity=-1;
-    if(entityArray[mentionArray[randomMention]->entityId].mentionSet.size()==1||
+    if(entityArray[mentionArray[randomMention].entityId].mentionSet.size()==1||
        ((double)rand()/(double)RAND_MAX)<=0.8){
        randomEntity=rand()%Nmen;
     } else{ // place it in an empty or create a new entity TODO create a new entity
@@ -96,11 +96,11 @@ int main ()
          emptyEntityVector.clear();
       }
     }
-    if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention]->entityId){
+    if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
        set<int>::iterator it;
        int loss=0;
-       for(it=entityArray[mentionArray[randomMention]->entityId].mentionSet.begin();it!=
-           entityArray[mentionArray[randomMention]->entityId].mentionSet.end();++it){
+       for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
+           entityArray[mentionArray[randomMention].entityId].mentionSet.end();++it){
            loss+=mentionArray[randomMention]->pairwiseScore(*mentionArray[*it]);
        }
        int gain=0;
@@ -112,9 +112,9 @@ int main ()
        if(gain>loss){// we should accept it
           accepted+=1;
           //remove the mention from old entity and place it into the new entity
-          entityArray[mentionArray[randomMention]->entityId].mentionSet.erase(randomMention);
+          entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
           entityArray[randomEntity].mentionSet.insert(randomMention);
-          mentionArray[randomMention]->entityId=randomEntity;
+          mentionArray[randomMention].entityId=randomEntity;
           currentEntropy=currentEntropy+gain-loss;
        } else {// accept it with a probablity
                if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
@@ -123,9 +123,9 @@ int main ()
                if(ratio>p){// accept it
                   accepted+=1;
                   //remove the mention from old entity and place it into the new entity
-                  entityArray[mentionArray[randomMention]->entityId].mentionSet.erase(randomMention);
+                  entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
                   entityArray[randomEntity].mentionSet.insert(randomMention);
-                  mentionArray[randomMention]->entityId=randomEntity;
+                  mentionArray[randomMention].entityId=randomEntity;
                   currentEntropy=currentEntropy+gain-loss;
                }
        }
@@ -136,7 +136,7 @@ int main ()
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
   
   //for(i=0; i<Nmen; i++)
-  //   cout << "mention " <<i<< "	"<<mentionArray[i]->entityId<<endl;
+  //   cout << "mention " <<i<< "	"<<mentionArray[i].entityId<<endl;
    
   return 0;
   
