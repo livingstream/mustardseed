@@ -21,12 +21,11 @@ using namespace std;
 #define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
 size_t strlcpy(char *dst, const char *src, size_t siz);
 
-int affinityArray[Nmen][Nmen];
-mention mentionArray[Nmen];
 entity entityArray[Nmen];
-
 int main ()
 {
+  mention* mentionArray[Nmen];
+  
   int i=0,j=0,currentEntropy=1;
   map<string,int>literalMap;
   // read data from nyt dataset 
@@ -41,31 +40,31 @@ int main ()
      namefile >> input;
      string word;
      stringstream stream(input);
-     i=0;
+     int i=0, doc_id, para_id, word_num, str_len, dest_entity;
+     const char* cstr;
      while( getline(stream, word, ',') ){
+        int doc_id, para_id, word_num, str_len, dest_entity;
         if(i==0)//extract the integer docid from string
-           mentionArray[mentionInter].doc=atoi((word.substr(8,16)+word.substr(17,21)).c_str());
+           doc_id=atoi((word.substr(8,16)+word.substr(17,21)).c_str());
         else if(i==1)
-           mentionArray[mentionInter].para=atoi(word.c_str());
+           para_id=atoi(word.c_str());
         else if(i==2)
-           mentionArray[mentionInter].word=atoi(word.c_str());
+           word_num=atoi(word.c_str());
         else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
-           mentionArray[mentionInter].len=word.size();//assgin length
-           int dest_entity=0;
+           str_len=word.size();
+           cstr=word.c_str();
            if(literalMap.count(word)==0){
              dest_entity=literalMap.size();
              literalMap.insert(pair<string,int>(word,dest_entity)); 
            } else {
              dest_entity=literalMap.find(word)->second;
            }
-           //update entity and mention
-           mentionArray[mentionInter].entityId=dest_entity;
-           entityArray[dest_entity].mentionSet.insert(mentionInter);
-           strcpy(mentionArray[mentionInter].token,word.c_str());
         }
         i++;
      }
+     mentionArray[mentionInter]=new mention(cstr,str_len,doc_id,para_id,word_num,0,dest_entity);
+     entityArray[dest_entity].mentionSet.insert(mentionInter);
      mentionInter++;
   }
 
@@ -82,7 +81,7 @@ int main ()
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     randomEntity=-1;
-    if(entityArray[mentionArray[randomMention].entityId].mentionSet.size()==1||
+    if(entityArray[mentionArray[randomMention]->entityId].mentionSet.size()==1||
        ((double)rand()/(double)RAND_MAX)<=0.8){
        randomEntity=rand()%Nmen;
     } else{ // place it in an empty or create a new entity TODO create a new entity
@@ -98,25 +97,25 @@ int main ()
          emptyEntityVector.clear();
       }
     }
-    if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
+    if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention]->entityId){
        set<int>::iterator it;
        int loss=0;
-       for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
-           entityArray[mentionArray[randomMention].entityId].mentionSet.end();++it){
-           loss+=mentionArray[randomMention].pairwiseScore(mentionArray[*it]);
+       for(it=entityArray[mentionArray[randomMention]->entityId].mentionSet.begin();it!=
+           entityArray[mentionArray[randomMention]->entityId].mentionSet.end();++it){
+           loss+=mentionArray[randomMention]->pairwiseScore(*mentionArray[*it]);
        }
        int gain=0;
        for(it=entityArray[randomEntity].mentionSet.begin();it!=
            entityArray[randomEntity].mentionSet.end();++it){
-           gain+=mentionArray[randomMention].pairwiseScore(mentionArray[*it]);
+           gain+=mentionArray[randomMention]->pairwiseScore(*mentionArray[*it]);
        }
        //accept or not
        if(gain>loss){// we should accept it
           accepted+=1;
           //remove the mention from old entity and place it into the new entity
-          entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
+          entityArray[mentionArray[randomMention]->entityId].mentionSet.erase(randomMention);
           entityArray[randomEntity].mentionSet.insert(randomMention);
-          mentionArray[randomMention].entityId=randomEntity;
+          mentionArray[randomMention]->entityId=randomEntity;
           currentEntropy=currentEntropy+gain-loss;
        } else {// accept it with a probablity
                if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
@@ -125,9 +124,9 @@ int main ()
                if(ratio>p){// accept it
                   accepted+=1;
                   //remove the mention from old entity and place it into the new entity
-                  entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
+                  entityArray[mentionArray[randomMention]->entityId].mentionSet.erase(randomMention);
                   entityArray[randomEntity].mentionSet.insert(randomMention);
-                  mentionArray[randomMention].entityId=randomEntity;
+                  mentionArray[randomMention]->entityId=randomEntity;
                   currentEntropy=currentEntropy+gain-loss;
                }
        }
@@ -138,7 +137,7 @@ int main ()
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
   
   //for(i=0; i<Nmen; i++)
-  //   cout << "mention " <<i<< "	"<<mentionArray[i].entityId<<endl;
+  //   cout << "mention " <<i<< "	"<<mentionArray[i]->entityId<<endl;
    
   return 0;
   
