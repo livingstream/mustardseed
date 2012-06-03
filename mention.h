@@ -26,13 +26,17 @@ class substrFeature {
           int len;
           int token_size;
 	  void set(char* tokenS, int length){
-            len=length;
-            int i=0;
-            char** token;
             memcpy(stringL,tokenS,strlen(tokenS)+1);
-	    this->token_size=size;
-            for(i=0;i<size;i++){
-              memcpy(tokenArray[i],token[i],strlen(token[i])+1);
+            this->len=length;
+            char* token = strtok(tokenS, " ");
+            memcpy(tokenArray[0],token,strlen(token)+1);
+            token_size=1;
+            while (token) {
+             token = strtok(NULL, " ");
+             if(token){
+                memcpy(tokenArray[token_size],token,strlen(token)+1);
+                token_size++;
+             }
             }
           }
 	  int substrScore(substrFeature& other){
@@ -74,7 +78,7 @@ class mention {
         prefixFeature prefixf;
         substrFeature substrf;
         lengthFeature lengthf;
-        mention(const char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
+        mention(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
            memcpy(this->stringL,str,strlen(str)+1);
            this->len=length;
            this->doc=doc_id;
