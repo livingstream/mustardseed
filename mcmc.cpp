@@ -41,7 +41,7 @@ int main ()
      string word;
      stringstream stream(input);
      int i=0, doc_id, para_id, word_num, str_len, dest_entity;
-     const char* cstr;
+     char tmpS[50];
      while( getline(stream, word, ',') ){
         int doc_id, para_id, word_num, str_len, dest_entity;
         if(i==0)//extract the integer docid from string
@@ -53,7 +53,7 @@ int main ()
         else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
            str_len=word.size();
-           cstr=word.c_str();
+           strcpy(tmpS,word.c_str());
            if(literalMap.count(word)==0){
              dest_entity=literalMap.size();
              literalMap.insert(pair<string,int>(word,dest_entity)); 
@@ -63,7 +63,7 @@ int main ()
         }
         i++;
      }
-     mentionArray[mentionInter]=new mention(cstr,str_len,doc_id,para_id,word_num,0,dest_entity);
+     mentionArray[mentionInter]=new mention(tmpS,str_len,doc_id,para_id,word_num,0,dest_entity);
      entityArray[dest_entity].mentionSet.insert(mentionInter);
      mentionInter++;
   }

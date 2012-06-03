@@ -1,7 +1,5 @@
 #include <iostream>
-#include <set>
 using namespace std;
-size_t strlcpy(char *dst, const char *src, size_t siz);
 
 class prefixFeature {
 	public:
@@ -16,7 +14,7 @@ class prefixFeature {
           int prefixScore(prefixFeature& other){
             return this->firstC==other.firstC ? (1+(this->secondC==other.secondC ? ((this->thirdC==other.thirdC ? 3 : 0)+2) : -1)): -1;
           }
-}
+};
 
 class substrFeature {
 	public:
@@ -53,7 +51,7 @@ class substrFeature {
               } 
               return sum;
 	  }
-}
+};
 
 class lengthFeature {
        public: 
@@ -64,7 +62,7 @@ class lengthFeature {
         int lengthScore(lengthFeature & other){
           return this->length==other.length ? 3 : 0;
         }
-}
+};
 
 class mention {
       public:
