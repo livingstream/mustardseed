@@ -76,7 +76,7 @@ class mention {
         prefixFeature prefixf;
         substrFeature substrf;
         lengthFeature lengthf;
-        mention(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
+        void set(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
            memcpy(this->stringL,str,strlen(str)+1);
            this->len=length;
            this->doc=doc_id;

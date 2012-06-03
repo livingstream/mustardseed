@@ -22,10 +22,9 @@ using namespace std;
 size_t strlcpy(char *dst, const char *src, size_t siz);
 
 entity entityArray[Nmen];
+mention mentionArray[Nmen];
 int main ()
 {
-  mention* mentionArray[Nmen];
-  
   int i=0,j=0,currentEntropy=1;
   map<string,int>literalMap;
   // read data from nyt dataset 
@@ -63,7 +62,7 @@ int main ()
         }
         i++;
      }
-     mentionArray[mentionInter]=new mention(tmpS,str_len,doc_id,para_id,word_num,0,dest_entity);
+     mentionArray[mentionInter].set(tmpS,str_len,doc_id,para_id,word_num,0,dest_entity);
      entityArray[dest_entity].mentionSet.insert(mentionInter);
      mentionInter++;
   }
