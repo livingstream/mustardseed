@@ -35,7 +35,9 @@ int main ()
   }
   int mentionInter=0;
   while(!namefile.eof() && mentionInter<Nmen){
-     namefile >> input;
+     getline(namefile,input,'\n');
+     cout<<input<<endl;
+     //namefile >> input;
      string word;
      stringstream stream(input);
      int i=0, doc_id, para_id, word_num, str_len, dest_entity;
