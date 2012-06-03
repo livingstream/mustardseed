@@ -36,14 +36,11 @@ int main ()
   int mentionInter=0;
   while(!namefile.eof() && mentionInter<Nmen){
      getline(namefile,input,'\n');
-     cout<<input<<endl;
-     //namefile >> input;
      string word;
      stringstream stream(input);
      int i=0, doc_id, para_id, word_num, str_len, dest_entity;
      char tmpS[50];
      while( getline(stream, word, ',') ){
-        cout<<word<<" "<<i<<endl;
         if(i==0)//extract the integer docid from string
            doc_id=(atoi(word.substr(8,16).c_str())-19920000)*10000+atoi(word.substr(17,21).c_str());
         else if(i==1)
@@ -69,7 +66,6 @@ int main ()
   }
 
   namefile.close();
-  return 0;
   //propose a change 
   int iter=0;
   int randomMention=0;
