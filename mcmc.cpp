@@ -101,12 +101,12 @@ int main ()
        int loss=0;
        for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
            entityArray[mentionArray[randomMention].entityId].mentionSet.end();++it){
-           loss+=mentionArray[randomMention]->pairwiseScore(*mentionArray[*it]);
+           loss+=mentionArray[randomMention].pairwiseScore(*mentionArray[*it]);
        }
        int gain=0;
        for(it=entityArray[randomEntity].mentionSet.begin();it!=
            entityArray[randomEntity].mentionSet.end();++it){
-           gain+=mentionArray[randomMention]->pairwiseScore(*mentionArray[*it]);
+           gain+=mentionArray[randomMention].pairwiseScore(*mentionArray[*it]);
        }
        //accept or not
        if(gain>loss){// we should accept it
