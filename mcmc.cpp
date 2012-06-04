@@ -6,17 +6,18 @@
 #include <string>
 #include <map>
 #include <ctime>
+#include <time.h>
 #include <cstdlib>
 #include <math.h>
-#include <vector>
 #include <stdio.h>
 #include <exception>
+#include <assert.h>
 #include "mention.h"
 #include "entity.h"
 #include "mcmclib.cpp"
 using namespace std;
 #define Nmen 3000 // number of mentions
-#define Niter 20000 // number of iterations
+#define Niter 200000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
 #define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
 
@@ -39,7 +40,7 @@ int main ()
      string word;
      stringstream stream(input);
      int i=0, doc_id, para_id, word_num, str_len, dest_entity;
-     char tmpS[50];
+     char tmpS[50]={'\0'};
      while( getline(stream, word, ',') ){
         if(i==0)//extract the integer docid from string
            doc_id=(atoi(word.substr(8,16).c_str())-19920000)*10000+atoi(word.substr(17,21).c_str());
@@ -73,6 +74,8 @@ int main ()
   int accepted=0;
   int rejected=0;
   srand((unsigned)time(0));
+  time_t beginTime, endTime;
+  beginTime = time (NULL);
   while(iter<Niter){
     iter=iter+1;
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
@@ -80,19 +83,47 @@ int main ()
     if(entityArray[mentionArray[randomMention].entityId].mentionSet.size()==1||
        ((double)rand()/(double)RAND_MAX)<=0.8){
        randomEntity=rand()%Nmen;
-    } else{ // place it in an empty or create a new entity TODO create a new entity
-      vector<int>emptyEntityVector;
-      for(i=0;i<Nmen;i++){
-          if(entityArray[i].mentionSet.size()==0){
-             emptyEntityVector.push_back(i);
+    } else{ // place it in an empty or create a new entity
+      int randomIndex=rand()%Nmen;
+      int tempIndex=-1;
+      int searchDirection=rand()%2;
+      if(searchDirection==0){
+        tempIndex=randomIndex;
+	while(tempIndex<Nmen){
+	  if(entityArray[tempIndex].mentionSet.size()==0){
+            randomEntity=tempIndex;
+            break;
           }
-      }
-      if(emptyEntityVector.size()>0){ 
-         int pos=(rand())%(emptyEntityVector.size());
-         randomEntity=emptyEntityVector.at(pos);
-         emptyEntityVector.clear();
+          tempIndex++;
+        }
+        tempIndex=randomIndex;
+        while(tempIndex>=0){
+          if(entityArray[tempIndex].mentionSet.size()==0){
+            randomEntity=tempIndex;
+            break;
+          }
+          tempIndex--;
+        }
+      } else{
+        tempIndex=randomIndex;
+        while(tempIndex>=0){
+          if(entityArray[tempIndex].mentionSet.size()==0){
+            randomEntity=tempIndex;
+            break;
+          }
+          tempIndex--;
+        }
+        tempIndex=randomIndex;
+        while(tempIndex<Nmen){
+          if(entityArray[tempIndex].mentionSet.size()==0){
+            randomEntity=tempIndex;
+            break;
+          }
+          tempIndex++;
+        }
       }
     }
+    assert (randomEntity != -1);
     if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
        set<int>::iterator it;
        int loss=0;
@@ -105,36 +136,34 @@ int main ()
            entityArray[randomEntity].mentionSet.end();++it){
            gain+=mentionArray[randomMention].pairwiseScore(mentionArray[*it]);
        }
+       bool accept=false;
        //accept or not
        if(gain>loss){// we should accept it
+          accept=true;
+       } else {// accept it with a probablity
+               double ratio=exp(gain-loss);
+               double p=((double)rand()/(double)RAND_MAX);
+               if(ratio>p){// accept it
+                  accept=true;
+               }
+       }
+       if(accept){
           accepted+=1;
           //remove the mention from old entity and place it into the new entity
           entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
           entityArray[randomEntity].mentionSet.insert(randomMention);
           mentionArray[randomMention].entityId=randomEntity;
           currentEntropy=currentEntropy+gain-loss;
-       } else {// accept it with a probablity
-               if(currentEntropy==0){cout<<"error! devided by 0"; return -1;}
-               double ratio=exp(gain-loss);
-               double p=((double)rand()/(double)RAND_MAX);
-               if(ratio>p){// accept it
-                  accepted+=1;
-                  //remove the mention from old entity and place it into the new entity
-                  entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
-                  entityArray[randomEntity].mentionSet.insert(randomMention);
-                  mentionArray[randomMention].entityId=randomEntity;
-                  currentEntropy=currentEntropy+gain-loss;
-               }
        }
     }
     cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
   }
+  endTime=time (NULL);
   cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
   cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
-  
+  cout<<"speed="<<iter/(endTime-beginTime)<<endl;
   //for(i=0; i<Nmen; i++)
   //   cout << "mention " <<i<< "	"<<mentionArray[i].entityId<<endl;
-   
   return 0;
   
 }
