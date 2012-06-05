@@ -42,12 +42,10 @@ class substrFeature {
 	      //one string is a substring of the second string
               int sum=this->len>=other.len ? (strstr(this->stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
               for (i=0;i<this->token_size;i++){
-              	sum+=this->tokenLen[i]>=other.len ?  (strstr(this->tokenArray[i],other.stringL)==NULL ? -1 : 10) : 
-                                                     (strstr(other.stringL,this->tokenArray[i])==NULL ? -1 : 10);
+              	sum+=strstr(other.stringL,this->tokenArray[i])==NULL ? -1:10;
               } 
               for (i=0;i<other.token_size;i++){
-                sum+=this->len>=other.tokenLen[i] ?  (strstr(this->stringL,other.tokenArray[i])==NULL ? -1:10) : 
-                                                     (strstr(other.tokenArray[i],this->stringL)==NULL? -1 : 10);
+                sum+=strstr(this->stringL,other.tokenArray[i])==NULL ? -1:10;
               } 
               return sum;
 	  }
