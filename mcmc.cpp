@@ -121,7 +121,7 @@ int main ()
           tempIndex++;
         }
         tempIndex=randomIndex;
-        while(tempIndex>=0){
+        while(randomEntity==-1&&tempIndex>=0){
           if(entityArray[tempIndex].mentionSet.size()==0){
             randomEntity=tempIndex;
             break;
@@ -138,7 +138,7 @@ int main ()
           tempIndex--;
         }
         tempIndex=randomIndex;
-        while(tempIndex<Nmen){
+        while(randomEntity==-1&&tempIndex<Nmen){
           if(entityArray[tempIndex].mentionSet.size()==0){
             randomEntity=tempIndex;
             break;
