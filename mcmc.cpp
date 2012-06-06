@@ -18,7 +18,8 @@
 #include "entity.h"
 #include "mcmclib.cpp"
 using namespace std;
-#define Nmen 3000 // number of mentions
+#define Nmen 300000 // number of mentions
+//#define Nmen 3000 // number of mentions
 #define Niter 200000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
 #define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull.csv"
@@ -45,7 +46,7 @@ entity entityArray[Nmen];
 mention mentionArray[Nmen];
 int main ()
 {
-  int i=0,j=0,currentEntropy=1;
+  int /*i=0,j=0,*/currentEntropy=1;
   map<string,int>literalMap;
   // read data from nyt dataset 
   ifstream namefile(nytdatapath);
@@ -104,7 +105,7 @@ int main ()
     randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
     randomEntity=-1;
     if(entityArray[mentionArray[randomMention].entityId].mentionSet.size()==1||
-       ((double)rand()/(double)RAND_MAX)<=0.8){
+       ((double)rand()/(double)RAND_MAX)<=0.95){
        randomEntity=rand()%Nmen;
     } else{ // place it in an empty or create a new entity
       int randomIndex=rand()%Nmen;
@@ -147,6 +148,7 @@ int main ()
       }
     }
     assert (randomEntity != -1);
+    assert (randomEntity != Nmen);
     if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
        set<int>::iterator it;
        int loss=0;
