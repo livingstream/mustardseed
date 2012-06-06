@@ -22,8 +22,8 @@ using namespace std;
 //#define Nmen 3000 // number of mentions
 #define Niter 200000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
-#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull.csv"
-//#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+//#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull.csv"
+#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
 
 
 void printMention(const mention& mm) {
@@ -46,7 +46,7 @@ entity entityArray[Nmen];
 mention mentionArray[Nmen];
 int main ()
 {
-  int /*i=0,j=0,*/currentEntropy=1;
+  int currentEntropy=1;
   map<string,int>literalMap;
   // read data from nyt dataset 
   ifstream namefile(nytdatapath);
