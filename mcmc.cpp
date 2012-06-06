@@ -5,12 +5,14 @@
 #include <algorithm>
 #include <string>
 #include <map>
+#include <list>
 #include <ctime>
 #include <time.h>
 #include <cstdlib>
 #include <math.h>
 #include <stdio.h>
 #include <exception>
+#include <set>
 #include <assert.h>
 #include "mention.h"
 #include "entity.h"
@@ -19,7 +21,25 @@ using namespace std;
 #define Nmen 3000 // number of mentions
 #define Niter 200000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
-#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull.csv"
+//#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+
+
+void printMention(const mention& mm) {
+	cerr << "<" << mm.stringL << "| " << mm.doc << " " << mm.para << 
+	" " << mm.entityId <<  ">";
+}
+
+void printEntity(const entity& e, const mention* ml) {
+	set<int>::iterator it;
+
+	cerr << "[" <<  e.id << "|";
+	for(it = e.mentionSet.begin(); it != e.mentionSet.end(); it++) {
+		//cerr << (*it) << " ";
+		printMention( ml[*it] );
+	}
+	cerr << "]";
+}
 
 entity entityArray[Nmen];
 mention mentionArray[Nmen];
@@ -34,6 +54,9 @@ int main ()
      cerr << "Error opening file";
      exit(EXIT_FAILURE);
   }
+	
+	getline(namefile,input,'\n'); //Ignore the header row
+
   int mentionInter=0;
   while(!namefile.eof() && mentionInter<Nmen){
      getline(namefile,input,'\n');
@@ -150,13 +173,18 @@ int main ()
        if(accept){
           accepted+=1;
           //remove the mention from old entity and place it into the new entity
+					cerr << "Mention to move: "; printMention(mentionArray[randomMention]); cerr << "\n";
+					cerr << "From Entity: "; printEntity(entityArray[mentionArray[randomMention].entityId], mentionArray); cerr << "\n";
+					cerr << "To entity: "; printEntity(entityArray[randomMention], mentionArray); cerr << "\n";
+					cerr << "------------------------------------\n";
+
           entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
           entityArray[randomEntity].mentionSet.insert(randomMention);
           mentionArray[randomMention].entityId=randomEntity;
           currentEntropy=currentEntropy+gain-loss;
        }
     }
-    cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
+    //cout<<"iteration "<<iter<<" score="<<currentEntropy<<endl;
   }
   endTime=time (NULL);
   cout<<"number of accepted proposals="<<"	"<<accepted<<endl;

@@ -17,8 +17,8 @@ class mention {
         int pairwiseScore(mention &);
         
 };
-mention::mention(char[] stringL, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
-        this->token=stringL;
+mention::mention(char[] _token, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
+        this->token=s_token;
         this->len=length;
         this->doc=doc_id;
         this->para=para_id;
