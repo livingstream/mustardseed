@@ -46,6 +46,10 @@ entity entityArray[Nmen];
 mention mentionArray[Nmen];
 int main ()
 {
+  int k=0;
+  for(k=0;k<Nmen;k++)
+     entityArray[k].id=k;
+
   int currentEntropy=1;
   map<string,int>literalMap;
   // read data from nyt dataset 
