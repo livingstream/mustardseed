@@ -96,7 +96,6 @@ int main ()
   int randomMention=0;
   int randomEntity=0;
   int accepted=0;
-  int rejected=0;
   srand((unsigned)time(0));
   time_t beginTime, endTime;
   beginTime = time (NULL);
