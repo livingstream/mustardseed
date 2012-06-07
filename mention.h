@@ -29,12 +29,12 @@ class substrFeature {
             memcpy(stringL,tokenS,strlen(tokenS)+1);
             this->len=length;
             char* token = strtok(tokenS, " ");
-            memcpy(tokenArray[0],token,min(maxtokenlen,(int)strlen(token))+1);
+            memcpy(tokenArray[0],token,min(maxtokenlen,(int)strlen(token)+1));
             token_size=1;
             while (token_size<maxtoken && token) {
              token = strtok(NULL, " ");
              if(token){
-                memcpy(tokenArray[token_size],token,min(maxtokenlen,(int)strlen(token))+1);
+                memcpy(tokenArray[token_size],token,min(maxtokenlen,(int)strlen(token)+1));
                 token_size++;
              }
             }
@@ -77,7 +77,7 @@ class mention {
         substrFeature substrf;
         lengthFeature lengthf;
         void set(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
-           memcpy(this->stringL,str,min(maxtokenlen,(int)strlen(str))+1);
+           memcpy(this->stringL,str,min(maxtokenlen,(int)strlen(str)+1));
            this->len=length;
            this->doc=doc_id;
            this->para=para_id;
