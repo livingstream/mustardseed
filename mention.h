@@ -66,7 +66,7 @@ class lengthFeature {
 
 class mention {
       public:
-        char stringL[50]; // The actual string
+        char stringL[maxtokenlen]; // The actual string
         int len;
         int doc; // The identifier for the document (could be a string)
         int para; // The number paragraph in the document
@@ -77,7 +77,7 @@ class mention {
         substrFeature substrf;
         lengthFeature lengthf;
         void set(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
-           memcpy(this->stringL,str,strlen(str)+1);
+           memcpy(this->stringL,str,min(maxtokenlen,(int)strlen(str))+1);
            this->len=length;
            this->doc=doc_id;
            this->para=para_id;
