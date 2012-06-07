@@ -68,7 +68,7 @@ int main ()
      string word;
      stringstream stream(input);
      int i=0, doc_id, para_id, word_num, str_len, dest_entity;
-     char tmpS[50]={'\0'};
+     char tmpS[maxtokenlen]={'\0'};
      while( getline(stream, word, ',') ){
         if(i==0)//extract the integer docid from string
            doc_id=(atoi(word.substr(8,16).c_str())-19920000)*10000+atoi(word.substr(17,21).c_str());
@@ -79,7 +79,7 @@ int main ()
         else if(i==3){
            transform(word.begin(),word.end(),word.begin(),::tolower);
            str_len=word.size();
-           strcpy(tmpS,word.c_str());
+           memcpy(tmpS,word.c_str(),min(maxtokenlen,(int)strlen(word.c_str())+1));
            if(literalMap.count(word)==0){
              dest_entity=literalMap.size();
              literalMap.insert(pair<string,int>(word,dest_entity)); 
@@ -180,7 +180,7 @@ int main ()
           //remove the mention from old entity and place it into the new entity
 					cerr << "Mention to move: "; printMention(mentionArray[randomMention]); cerr << "\n";
 					cerr << "From Entity: "; printEntity(entityArray[mentionArray[randomMention].entityId], mentionArray); cerr << "\n";
-					cerr << "To entity: "; printEntity(entityArray[randomMention], mentionArray); cerr << "\n";
+					cerr << "To entity: "; printEntity(entityArray[randomEntity], mentionArray); cerr << "\n";
 					cerr << "------------------------------------\n";
 
           entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
