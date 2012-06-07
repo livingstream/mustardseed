@@ -84,7 +84,7 @@ class mention {
            this->word=word_id;
            this->pos=pos_id;
            this->entityId=entity_id;
-           char temp[4];
+           char temp[4]={'\0'};
            memcpy(temp,str,3);
            prefixf.set(temp[0],temp[1],temp[2]);
            substrf.set(str,length);
