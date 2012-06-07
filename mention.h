@@ -1,5 +1,6 @@
 #include <iostream>
 #include <assert.h>
+#include <algorithm>
 using namespace std;
 #define maxtoken 10
 #define maxtokenlen 50
@@ -28,16 +29,13 @@ class substrFeature {
             memcpy(stringL,tokenS,strlen(tokenS)+1);
             this->len=length;
             char* token = strtok(tokenS, " ");
-            if(strlen(token)>49)cout<<strlen(token)<<endl;
-            memcpy(tokenArray[0],token,min(maxtokenlen,strlen(token))+1);
+            memcpy(tokenArray[0],token,min(maxtokenlen,(int)strlen(token))+1);
             token_size=1;
-            while (token) {
+            while (token_size<maxtoken && token) {
              token = strtok(NULL, " ");
              if(token){
-                assert(strlen(token)<=49);
-                memcpy(tokenArray[token_size],token,strlen(token)+1);
+                memcpy(tokenArray[token_size],token,min(maxtokenlen,(int)strlen(token))+1);
                 token_size++;
-                assert(token_size<=maxtoken);
              }
             }
           }
