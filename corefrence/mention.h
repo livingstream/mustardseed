@@ -1,14 +1,22 @@
 #include <iostream>
 #include <assert.h>
 #include <algorithm>
+#include <set>
+#include <cstring>
 using namespace std;
 #define maxtoken 10
 #define maxtokenlen 50
+
+set<string>tokenDict;
+
 class prefixFeature {
 	public:
           char firstC;
           char secondC;
           char thirdC;
+          prefixFeature(){
+	    firstC='\0'; secondC='\0'; thirdC='\0';
+          }
           void set(char first, char second, char third){
             firstC=first;
             secondC=second;
@@ -22,9 +30,21 @@ class prefixFeature {
 class substrFeature {
 	public:
           char tokenArray[maxtoken][maxtokenlen];
+          int tokenIntArray[maxtoken];
           char stringL[maxtokenlen];
           int len;
           int token_size;
+          substrFeature(){
+            int i=0,j=0;
+            for(i=0;i<maxtoken;i++){
+            	tokenIntArray[i]=0;
+            	stringL[i]='\0';
+  		for(j=0;j<maxtokenlen;j++)
+		tokenArray[i][j]='\0';
+            }
+            len=0;
+            token_size=0;
+          }
 	  void set(char* tokenS, int length){
             memcpy(stringL,tokenS,strlen(tokenS)+1);
             this->len=length;
@@ -58,6 +78,9 @@ class substrFeature {
 class lengthFeature {
        public: 
 	int length;
+        lengthFeature(){
+	  length=0;
+        }
         void set(int len){
           this->length=len;
         }
@@ -78,6 +101,12 @@ class mention {
         prefixFeature prefixf;
         substrFeature substrf;
         lengthFeature lengthf;
+        mention(){
+	  int i=0;
+          for(i=0;i<maxtokenlen;i++)
+	    stringL[i]='\0';
+          len=0;doc=0;para=0;word=0;pos=0;entityId=0;
+        }
         void set(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
            memcpy(this->stringL,str,min(maxtokenlen,(int)strlen(str)+1));
            this->len=length;
