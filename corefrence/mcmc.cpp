@@ -24,6 +24,8 @@ using namespace std;
 //#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull.csv"
 #define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
 
+entity entityArray[Nmen];
+mention mentionArray[Nmen];
 
 void printMention(const mention& mm) {
 	cerr << "<" << mm.stringL << "| " << mm.doc << " " << mm.para << 
@@ -40,9 +42,49 @@ void printEntity(const entity& e, const mention* ml) {
 	}
 	cerr << "]";
 }
+int findEmptyEntity(){
+        int randomEntity=-1;
+	int randomIndex=rand()%Nmen;
+	int tempIndex=-1;
+	int searchDirection=rand()%2;
+	if(searchDirection==0){
+		tempIndex=randomIndex;
+		while(tempIndex<Nmen){
+			if(entityArray[tempIndex].mentionSet.size()==0){
+				randomEntity=tempIndex;
+				break;
+			}
+			tempIndex++;
+		}
+		tempIndex=randomIndex;
+		while(randomEntity==-1&&tempIndex>=0){
+			if(entityArray[tempIndex].mentionSet.size()==0){
+				randomEntity=tempIndex;
+				break;
+			}
+			tempIndex--;
+		}
+	} else{
+		tempIndex=randomIndex;
+		while(tempIndex>=0){
+			if(entityArray[tempIndex].mentionSet.size()==0){
+				randomEntity=tempIndex;
+				break;
+			}
+			tempIndex--;
+		}
+		tempIndex=randomIndex;
+		while(randomEntity==-1&&tempIndex<Nmen){
+			if(entityArray[tempIndex].mentionSet.size()==0){
+				randomEntity=tempIndex;
+				break;
+			}
+			tempIndex++;
+		}
+	}
 
-entity entityArray[Nmen];
-mention mentionArray[Nmen];
+}
+
 int main ()
 {
   int k=0;
@@ -59,7 +101,7 @@ int main ()
      exit(EXIT_FAILURE);
   }
 	
-	getline(namefile,input,'\n'); //Ignore the header row
+  getline(namefile,input,'\n'); //Ignore the header row
 
   int mentionInter=0;
   while(!namefile.eof() && mentionInter<Nmen){
@@ -110,48 +152,11 @@ int main ()
        ((double)rand()/(double)RAND_MAX)<=0.95){
        randomEntity=rand()%Nmen;
     } else{ // place it in an empty or create a new entity
-      int randomIndex=rand()%Nmen;
-      int tempIndex=-1;
-      int searchDirection=rand()%2;
-      if(searchDirection==0){
-        tempIndex=randomIndex;
-	while(tempIndex<Nmen){
-	  if(entityArray[tempIndex].mentionSet.size()==0){
-            randomEntity=tempIndex;
-            break;
-          }
-          tempIndex++;
-        }
-        tempIndex=randomIndex;
-        while(randomEntity==-1&&tempIndex>=0){
-          if(entityArray[tempIndex].mentionSet.size()==0){
-            randomEntity=tempIndex;
-            break;
-          }
-          tempIndex--;
-        }
-      } else{
-        tempIndex=randomIndex;
-        while(tempIndex>=0){
-          if(entityArray[tempIndex].mentionSet.size()==0){
-            randomEntity=tempIndex;
-            break;
-          }
-          tempIndex--;
-        }
-        tempIndex=randomIndex;
-        while(randomEntity==-1&&tempIndex<Nmen){
-          if(entityArray[tempIndex].mentionSet.size()==0){
-            randomEntity=tempIndex;
-            break;
-          }
-          tempIndex++;
-        }
-      }
+      randomEntity=findEmptyEntity();  
     }
     assert (randomEntity != -1);
     assert (randomEntity != Nmen);
-    if(randomEntity!=-1 && randomEntity!=mentionArray[randomMention].entityId){
+    if(randomEntity!=mentionArray[randomMention].entityId){
        set<int>::iterator it;
        int loss=0;
        for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
