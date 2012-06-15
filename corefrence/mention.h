@@ -1,13 +1,12 @@
 #include <iostream>
 #include <assert.h>
 #include <algorithm>
-#include <set>
+#include <map>
 #include <cstring>
 using namespace std;
 #define maxtoken 10
 #define maxtokenlen 50
-
-set<string>tokenDict;
+map<string,int>tokenDict;
 
 class prefixFeature {
 	public:
@@ -49,11 +48,28 @@ class substrFeature {
             memcpy(stringL,tokenS,strlen(tokenS)+1);
             this->len=length;
             char* token = strtok(tokenS, " ");
+            int wordindex=0;
+            if(tokenDict.count(token)==0){
+              wordindex=tokenDict.size();
+              tokenDict.insert(pair<string,int>(token,wordindex));
+            } else {
+              wordindex=tokenDict.find(token)->second;
+            }
+            tokenIntArray[0]=wordindex; 
             memcpy(tokenArray[0],token,min(maxtokenlen,(int)strlen(token)+1));
             token_size=1;
             while (token_size<maxtoken && token) {
              token = strtok(NULL, " ");
              if(token){
+                int wordindex=0;
+                if(tokenDict.count(token)==0){
+                   wordindex=tokenDict.size();
+                   tokenDict.insert(pair<string,int>(token,wordindex));
+                } else {
+                   wordindex=tokenDict.find(token)->second;
+                }
+                tokenIntArray[token_size]=wordindex;
+
                 memcpy(tokenArray[token_size],token,min(maxtokenlen,(int)strlen(token)+1));
                 token_size++;
              }
