@@ -76,17 +76,20 @@ class substrFeature {
             }
           }
 	  int substrScore(substrFeature& other){
-              int i=0;
+              int i=0,j=0;
 	      //one string is a substring of the second string
-              //int sum=this->len>=other.len ? (strstr(this->stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
-              int sum=(strstr(this->stringL,other.stringL)==NULL ? -1 : 10);
-              sum+=(strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
-              for (i=0;i<this->token_size;i++){
-              	sum+=strstr(other.stringL,this->tokenArray[i])==NULL ? -1:10;
-              } 
-              for (i=0;i<other.token_size;i++){
-                sum+=strstr(this->stringL,other.tokenArray[i])==NULL ? -1:10;
-              } 
+              int sum=this->len>=other.len ? (strstr(this->stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
+              //int sum=(strstr(this->stringL,other.stringL)==NULL ? -1 : 10);
+              //sum+=(strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
+              //for (i=0;i<this->token_size;i++){
+              //	sum+=strstr(other.stringL,this->tokenArray[i])==NULL ? -1:10;
+              //} 
+              //for (i=0;i<other.token_size;i++){
+              //  sum+=strstr(this->stringL,other.tokenArray[i])==NULL ? -1:10;
+              //}
+              for(i=0;i<this->token_size;i++)
+                 for(j=0;j<other.token_size;j++)
+                    sum+=(this->tokenIntArray[i]!=other.tokenIntArray[j] ? -1:10); 
               return sum;
 	  }
 };
