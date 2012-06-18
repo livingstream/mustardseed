@@ -6,7 +6,6 @@
 using namespace std;
 #define maxtoken 10
 #define maxtokenlen 50
-unordered_map<string,int>tokenDict;
 
 class prefixFeature {
 	public:
@@ -28,6 +27,7 @@ class prefixFeature {
 
 class substrFeature {
 	public:
+          static unordered_map<string,int> tokenDict;
           char tokenArray[maxtoken][maxtokenlen];
           int tokenIntArray[maxtoken];
           char stringL[maxtokenlen];
@@ -35,64 +35,64 @@ class substrFeature {
           int token_size;
           substrFeature(){
             int i=0,j=0;
+            memset(stringL,'\0',maxtokenlen);
             for(i=0;i<maxtoken;i++){
             	tokenIntArray[i]=0;
-            	stringL[i]='\0';
-  		for(j=0;j<maxtokenlen;j++)
-		tokenArray[i][j]='\0';
+                memset(tokenArray[i],'\0',maxtokenlen);
             }
             len=0;
             token_size=0;
           }
-	  void set(char* tokenS, int length){
-            memcpy(stringL,tokenS,strlen(tokenS)+1);
-            this->len=length;
-            char* token = strtok(tokenS, " ");
-            int wordindex=0;
-            if(tokenDict.count(token)==0){
-              wordindex=tokenDict.size();
-              tokenDict.insert(pair<string,int>(token,wordindex));
-            } else {
-              wordindex=tokenDict.find(token)->second;
-            }
-            tokenIntArray[0]=wordindex; 
-            memcpy(tokenArray[0],token,min(maxtokenlen,(int)strlen(token)+1));
-            token_size=1;
-            while (token_size<maxtoken && token) {
-             token = strtok(NULL, " ");
-             if(token){
-                int wordindex=0;
-                if(tokenDict.count(token)==0){
-                   wordindex=tokenDict.size();
-                   tokenDict.insert(pair<string,int>(token,wordindex));
-                } else {
-                   wordindex=tokenDict.find(token)->second;
-                }
-                tokenIntArray[token_size]=wordindex;
-
-                memcpy(tokenArray[token_size],token,min(maxtokenlen,(int)strlen(token)+1));
-                token_size++;
-             }
-            }
-          }
-	  int substrScore(substrFeature& other){
-              int i=0,j=0;
-	      //one string is a substring of the second string
-              int sum=this->len>=other.len ? (strstr(this->stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
-              //int sum=(strstr(this->stringL,other.stringL)==NULL ? -1 : 10);
-              //sum+=(strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
-              //for (i=0;i<this->token_size;i++){
-              //	sum+=strstr(other.stringL,this->tokenArray[i])==NULL ? -1:10;
-              //} 
-              //for (i=0;i<other.token_size;i++){
-              //  sum+=strstr(this->stringL,other.tokenArray[i])==NULL ? -1:10;
-              //}
-              for(i=0;i<this->token_size;i++)
-                 for(j=0;j<other.token_size;j++)
-                    sum+=(this->tokenIntArray[i]!=other.tokenIntArray[j] ? -1:10); 
-              return sum;
-	  }
+	  void set(char* tokenS, int length);
+	  int substrScore(substrFeature& other);
 };
+
+unordered_map<string,int> substrFeature::tokenDict;
+
+void substrFeature::set(char* tokenS, int length){
+	memcpy(stringL,tokenS,strlen(tokenS)+1);
+	this->len=length;
+	char* token = strtok(tokenS, " ");
+	cout<<token<<endl;
+	cout<<"size"<<tokenDict.size()<<endl;
+	int wordindex=0;
+	if(tokenDict.count((string)token)==0){
+		cout<<"set21"<<endl;
+		wordindex=substrFeature::tokenDict.size();
+		substrFeature::tokenDict.insert(pair<string,int>(token,wordindex));
+	} else {
+		wordindex=substrFeature::tokenDict.find(token)->second;
+	}
+	tokenIntArray[0]=wordindex;
+	memcpy(tokenArray[0],token,min(maxtokenlen,(int)strlen(token)+1));
+	token_size=1;
+	while (token_size<maxtoken && token) {
+		token = strtok(NULL, " ");
+		if(token){
+			int wordindex=0;
+			if(substrFeature::tokenDict.count(token)==0){
+				wordindex=substrFeature::tokenDict.size();
+				substrFeature::tokenDict.insert(pair<string,int>(token,wordindex));
+			} else {
+				wordindex=substrFeature::tokenDict.find(token)->second;
+			}
+			tokenIntArray[token_size]=wordindex;
+
+			memcpy(substrFeature::tokenArray[token_size],token,min(maxtokenlen,(int)strlen(token)+1));
+			token_size++;
+		}
+	}
+}
+
+int substrFeature::substrScore(substrFeature& other){
+	int i=0,j=0;
+	//one string is a substring of the second string
+	int sum=this->len>=other.len ? (strstr(this->stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
+	for(i=0;i<this->token_size;i++)
+		for(j=0;j<other.token_size;j++)
+			sum+=(this->tokenIntArray[i]!=other.tokenIntArray[j] ? -1:10);
+	return sum;
+}
 
 class lengthFeature {
        public: 
@@ -135,7 +135,6 @@ class mention {
            this->pos=pos_id;
            this->entityId=entity_id;
            char temp[4]={'\0','\0','\0','\0'};
-           memcpy(temp,str,3);
            prefixf.set(temp[0],temp[1],temp[2]);
            substrf.set(str,length);
            lengthf.set(length);
