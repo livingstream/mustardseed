@@ -1,12 +1,12 @@
 #include <iostream>
 #include <assert.h>
 #include <algorithm>
-#include <map>
+#include <unordered_map>
 #include <cstring>
 using namespace std;
 #define maxtoken 10
 #define maxtokenlen 50
-map<string,int>tokenDict;
+unordered_map<string,int>tokenDict;
 
 class prefixFeature {
 	public:

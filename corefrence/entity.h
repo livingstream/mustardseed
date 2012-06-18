@@ -1,12 +1,12 @@
 #include <iostream>
-#include <set>
+#include <unordered_set>
 using namespace std;
 #define clusterPrefixW (10)
 #define clusterSameDocW (10)
 class clusterPrefixF {
 	public:
           bool same_prfeix;
-          set<int>prefixSet;
+          unordered_set<int>prefixSet;
           int prefix[256];
           clusterPrefixF(){
              memset(prefix,0, sizeof(prefix) * sizeof(int));
@@ -26,7 +26,7 @@ class clusterPrefixF {
 
 class clusterSameDocF {
 	public:
-	  map<int,int> docMap;
+	  unordered_map<int,int> docMap;
           void add(int doc_id){
 	    docMap[doc_id]=docMap[doc_id]+1;
           }
@@ -42,7 +42,7 @@ class clusterSameDocF {
 class entity {
       public:
         int id; // An unique identifier for the entity (in consequential)
-        set<int> mentionSet; // all the mentions belong to the entity   
+        unordered_set<int> mentionSet; // all the mentions belong to the entity   
         clusterPrefixF clusterPrefixf;
         clusterSameDocF clusterSameDocf;
         int clusterScore(){
