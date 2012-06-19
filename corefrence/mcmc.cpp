@@ -15,11 +15,11 @@
 #include "mention.h"
 #include "entity.h"
 using namespace std;
-#define Nmen 300000 // number of mentions
+#define Nmen 3000 // number of mentions
 //#define Nmen 3000 // number of mentions
 #define Niter 200000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
-//#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull.csv"
+//#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
 #define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
 
 entity entityArray[Nmen];
@@ -59,6 +59,7 @@ int findEmptyEntity(int sourceId){
 
 int main ()
 {
+        cout<<"h0"<<endl;
 	int k=0;
 	for(k=0;k<Nmen;k++)
 		entityArray[k].id=k;
@@ -72,6 +73,7 @@ int main ()
 		cerr << "Error opening file";
 		exit(EXIT_FAILURE);
 	}
+        cout<<"h1"<<endl;
 	getline(namefile,input,'\n'); //Ignore the header row
 
 	int mentionInter=0;
@@ -107,6 +109,7 @@ int main ()
 		mentionInter++;
 	}
 
+        cout<<"h2"<<endl;
 	namefile.close();
 	//propose a change 
 	int iter=0;
@@ -117,6 +120,7 @@ int main ()
 	time_t beginTime, endTime;
 	beginTime = time (NULL);
 	while(iter<Niter){
+               cout<<"h inter "<<iter<<endl;
 		iter=iter+1;
 		randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
 		randomEntity=-1;
