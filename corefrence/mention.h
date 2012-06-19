@@ -1,4 +1,3 @@
-#include <iostream>
 #include <assert.h>
 #include <algorithm>
 #include <unordered_map>
@@ -34,7 +33,7 @@ class substrFeature {
           int len;
           int token_size;
           substrFeature(){
-            int i=0,j=0;
+            int i=0;
             memset(stringL,'\0',maxtokenlen);
             for(i=0;i<maxtoken;i++){
             	tokenIntArray[i]=0;
@@ -43,23 +42,24 @@ class substrFeature {
             len=0;
             token_size=0;
           }
-	  void set(char* tokenS, int length);
+	  void set(char* tokenS, size_t length);
 	  int substrScore(substrFeature& other);
 };
 
 unordered_map<string,int> substrFeature::tokenDict;
 
-void substrFeature::set(char* tokenS, int length){
+void substrFeature::set(char* tokenS, size_t length){
 	memcpy(stringL,tokenS,strlen(tokenS)+1);
 	this->len=length;
 	char* token = strtok(tokenS, " ");
 	cout<<token<<endl;
-	cout<<"size"<<tokenDict.size()<<endl;
-	int wordindex=0;
-	if(tokenDict.count((string)token)==0){
-		cout<<"set21"<<endl;
+	cout<<"size: "<<tokenDict.size()<<endl;
+	size_t wordindex=0;
+	if(tokenDict.find((string)token) == tokenDict.end()){
+	//if(tokenDict.count((string)token)==0){
+		//cout<<"set21"<<endl;
 		wordindex=substrFeature::tokenDict.size();
-		substrFeature::tokenDict.insert(pair<string,int>(token,wordindex));
+		substrFeature::tokenDict.insert(pair<string,size_t>(token,wordindex));
 	} else {
 		wordindex=substrFeature::tokenDict.find(token)->second;
 	}
@@ -72,7 +72,7 @@ void substrFeature::set(char* tokenS, int length){
 			int wordindex=0;
 			if(substrFeature::tokenDict.count(token)==0){
 				wordindex=substrFeature::tokenDict.size();
-				substrFeature::tokenDict.insert(pair<string,int>(token,wordindex));
+				substrFeature::tokenDict.insert(pair<string,size_t>(token,wordindex));
 			} else {
 				wordindex=substrFeature::tokenDict.find(token)->second;
 			}
@@ -96,11 +96,11 @@ int substrFeature::substrScore(substrFeature& other){
 
 class lengthFeature {
        public: 
-	int length;
+	size_t length;
         lengthFeature(){
 	  length=0;
         }
-        void set(int len){
+        void set(size_t len){
           this->length=len;
         }
         int lengthScore(lengthFeature & other){

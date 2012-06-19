@@ -1,4 +1,3 @@
-#include <iostream>
 #include <unordered_set>
 using namespace std;
 #define clusterPrefixW (10)
@@ -6,7 +5,7 @@ using namespace std;
 class clusterPrefixF {
 	public:
           bool same_prfeix;
-          unordered_set<int>prefixSet;
+          unordered_set<size_t>prefixSet;
           int prefix[256];
           clusterPrefixF(){
              memset(prefix,0, sizeof(prefix) * sizeof(int));
@@ -26,11 +25,11 @@ class clusterPrefixF {
 
 class clusterSameDocF {
 	public:
-	  unordered_map<int,int> docMap;
+	  unordered_map<size_t,size_t> docMap;
           void add(int doc_id){
 	    docMap[doc_id]=docMap[doc_id]+1;
           }
-	  void remove(int doc_id){
+	  void remove(size_t doc_id){
             docMap[doc_id]=docMap[doc_id]-1;
             if(docMap[doc_id]==0) docMap.erase(doc_id);
           }
@@ -41,8 +40,8 @@ class clusterSameDocF {
 
 class entity {
       public:
-        int id; // An unique identifier for the entity (in consequential)
-        unordered_set<int> mentionSet; // all the mentions belong to the entity   
+        size_t id; // An unique identifier for the entity (in consequential)
+        unordered_set<size_t> mentionSet; // all the mentions belong to the entity   
         clusterPrefixF clusterPrefixf;
         clusterSameDocF clusterSameDocf;
         int clusterScore(){

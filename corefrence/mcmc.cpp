@@ -19,28 +19,33 @@ using namespace std;
 //#define Nmen 3000 // number of mentions
 #define Niter 200000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
-//#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
-#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
+//#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+#define DEBUG false
 
 entity entityArray[Nmen];
 mention mentionArray[Nmen];
 
-void printMention(const mention& mm) {
-	cerr << "<" << mm.stringL << "| " << mm.doc << " " << mm.para << 
-		" " << mm.entityId <<  ">";
-}
-
-void printEntity(const entity& e, const mention* ml) {
-	cerr << "[" <<  e.id << "|";
-	for(auto it = e.mentionSet.begin(); it != e.mentionSet.end(); it++) {
-		//cerr << (*it) << " ";
-		printMention( ml[*it] );
+void printMention(const mention& mm, bool debug = DEBUG) {
+	if(debug) {
+		cerr << "<" << mm.stringL << "| " << mm.doc << " " << mm.para << 
+			" " << mm.entityId <<  ">";
 	}
-	cerr << "]";
 }
 
-int findNonEmptyEntity(int sourceId){
-	int randomEntity=-1;
+void printEntity(const entity& e, const mention* ml, bool debug = DEBUG) {
+	if(debug) {
+		cerr << "[" <<  e.id << "|";
+		for(auto it = e.mentionSet.begin(); it != e.mentionSet.end(); it++) {
+			//cerr << (*it) << " ";
+			printMention( ml[*it] );
+		}
+		cerr << "]";
+	}
+}
+
+size_t findNonEmptyEntity(size_t sourceId){
+	size_t randomEntity=-1;
 	while(true){
 		randomEntity=rand()%Nmen;
 		if(entityArray[randomEntity].mentionSet.size()>0 && randomEntity!=sourceId)
@@ -48,8 +53,8 @@ int findNonEmptyEntity(int sourceId){
 	}
 }
 
-int findEmptyEntity(int sourceId){
-	int randomEntity=-1;
+size_t findEmptyEntity(size_t sourceId){
+	size_t randomEntity=-1;
 	while(true){
 		randomEntity=rand()%Nmen;
 		if(entityArray[randomEntity].mentionSet.size()==0 && randomEntity!=sourceId)
@@ -59,13 +64,12 @@ int findEmptyEntity(int sourceId){
 
 int main ()
 {
-        cout<<"h0"<<endl;
-	int k=0;
+	size_t k=0;
 	for(k=0;k<Nmen;k++)
 		entityArray[k].id=k;
 
-	int currentEntropy=1;
-	unordered_map<string,int>literalMap;
+	size_t currentEntropy=1;
+	unordered_map<string,size_t>literalMap;
 	// read data from nyt dataset 
 	ifstream namefile(nytdatapath);
 	string input;
@@ -73,7 +77,6 @@ int main ()
 		cerr << "Error opening file";
 		exit(EXIT_FAILURE);
 	}
-        cout<<"h1"<<endl;
 	getline(namefile,input,'\n'); //Ignore the header row
 
 	int mentionInter=0;
@@ -81,7 +84,7 @@ int main ()
 		getline(namefile,input,'\n');
 		string word;
 		stringstream stream(input);
-		int i=0, doc_id, para_id, word_num, str_len, dest_entity;
+		size_t i=0, doc_id, para_id, word_num, str_len, dest_entity;
 		char tmpS[maxtokenlen+1];
 		memset(tmpS,'\0',maxtokenlen+1);
 		while( getline(stream, word, ',') ){
@@ -97,7 +100,7 @@ int main ()
 				memcpy(tmpS,word.c_str(),min(maxtokenlen,(int)strlen(word.c_str())+1));
 				if(literalMap.count(word)==0){
 					dest_entity=literalMap.size();
-					literalMap.insert(pair<string,int>(word,dest_entity)); 
+					literalMap.insert(pair<string,size_t>(word,dest_entity)); 
 				} else {
 					dest_entity=literalMap.find(word)->second;
 				}
@@ -109,18 +112,16 @@ int main ()
 		mentionInter++;
 	}
 
-        cout<<"h2"<<endl;
 	namefile.close();
 	//propose a change 
-	int iter=0;
-	int randomMention=0;
-	int randomEntity=0;
-	int accepted=0;
+	size_t iter=0;
+	size_t randomMention=0;
+	size_t randomEntity=0;
+	size_t accepted=0;
 	srand((unsigned)time(0));
 	time_t beginTime, endTime;
 	beginTime = time (NULL);
 	while(iter<Niter){
-               cout<<"h inter "<<iter<<endl;
 		iter=iter+1;
 		randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
 		randomEntity=-1;
@@ -130,7 +131,7 @@ int main ()
 		} else{ // place it in an empty or create a new entity
 			randomEntity=findEmptyEntity(mentionArray[randomMention].entityId);
 		}
-		unordered_set<int>::iterator it;
+		unordered_set<size_t>::iterator it;
 		int loss=0;
 		for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
 				entityArray[mentionArray[randomMention].entityId].mentionSet.end();++it){
@@ -145,7 +146,8 @@ int main ()
 		//accept or not
 		if(gain>loss){// we should accept it
 			accept=true;
-		} else {// accept it with a probablity
+		} 
+		else {// accept it with a probablity
 			double ratio=exp(gain-loss);
 			double p=((double)rand()/(double)RAND_MAX);
 			if(ratio>p){// accept it
@@ -155,10 +157,12 @@ int main ()
 		if(accept){
 			accepted+=1;
 			//remove the mention from old entity and place it into the new entity
-			cerr << "Mention to move: "; printMention(mentionArray[randomMention]); cerr << "\n";
-			cerr << "From Entity: "; printEntity(entityArray[mentionArray[randomMention].entityId], mentionArray); cerr << "\n";
-			cerr << "To entity: "; printEntity(entityArray[randomEntity], mentionArray); cerr << "\n";
-			cerr << "------------------------------------\n";
+			if(DEBUG) {
+				cerr << "Mention to move: "; printMention(mentionArray[randomMention]); cerr << "\n";
+				cerr << "From Entity: "; printEntity(entityArray[mentionArray[randomMention].entityId], mentionArray); cerr << "\n";
+				cerr << "To entity: "; printEntity(entityArray[randomEntity], mentionArray); cerr << "\n";
+				cerr << "------------------------------------\n";
+			}
 			entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
 			entityArray[randomEntity].mentionSet.insert(randomMention);
 			mentionArray[randomMention].entityId=randomEntity;
