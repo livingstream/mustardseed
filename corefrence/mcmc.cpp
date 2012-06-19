@@ -69,7 +69,7 @@ int main ()
 		entityArray[k].id=k;
 
 	size_t currentEntropy=1;
-	unordered_map<string,size_t> literalMap({{string("NULL0"),0}, {string("NULL1"),0}});
+	unordered_map<string,int> literalMap({{string("NULL"),0}, {string("NULL"),0}});
 	// read data from nyt dataset 
 	ifstream namefile(nytdatapath);
 	string input;
@@ -114,7 +114,7 @@ int main ()
 				memcpy(tmpS,word.c_str(),min(maxtokenlen,(int)strlen(word.c_str())+1));
 				if(literalMap.count(word)==0){
 					dest_entity=literalMap.size();
-					literalMap.insert(pair<string,size_t>(word,dest_entity)); 
+					literalMap.insert(pair<string,int>(word,dest_entity)); 
 				} else {
 					dest_entity=literalMap.find(word)->second;
 				}
