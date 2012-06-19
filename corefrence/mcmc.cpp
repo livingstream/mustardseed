@@ -69,7 +69,7 @@ int main ()
 		entityArray[k].id=k;
 
 	size_t currentEntropy=1;
-	unordered_map<string,size_t>literalMap;
+	unordered_map<string,size_t> literalMap({{string("NULL0"),0}, {string("NULL1"),0}});
 	// read data from nyt dataset 
 	ifstream namefile(nytdatapath);
 	string input;
@@ -88,8 +88,22 @@ int main ()
 		char tmpS[maxtokenlen+1];
 		memset(tmpS,'\0',maxtokenlen+1);
 		while( getline(stream, word, ',') ){
-			if(i==0)//extract the integer docid from string
-				doc_id=(atoi(word.substr(8,16).c_str())-19920000)*10000+atoi(word.substr(17,21).c_str());
+			if(i==0){
+				//extract the integer docid from string
+				//const string s816(9, '\0');
+				//const string s1721(5, '\0' );
+				//s816.assign(word, 8,16);
+				//s1721.assign(word, 17,21);
+				//const string s816 = word.assign(word, 8,16);
+				//const string s1721 = word.assign(word, 17,21);
+				const char* cword = word.c_str();
+				char s816[9] = {'\0', '\0', '\0', '\0','\0', '\0', '\0', '\0','\0'};
+				strncpy(s816, cword+8, 8);
+				char s1721[5] = {'\0', '\0', '\0', '\0','\0',}; 
+				strncpy(s1721, cword+17, 4);
+				doc_id=(atoi(s816)-19920000)*10000+atoi(s1721);
+				//doc_id=(atoi(s816.c_str())-19920000)*10000+atoi(s1721.c_str());
+			}
 			else if(i==1)
 				para_id=atoi(word.c_str());
 			else if(i==2)

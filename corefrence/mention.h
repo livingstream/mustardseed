@@ -46,7 +46,7 @@ class substrFeature {
 	  int substrScore(substrFeature& other);
 };
 
-unordered_map<string,int> substrFeature::tokenDict;
+unordered_map<string,int> substrFeature::tokenDict({{string("NULL"),0}, {string("NULL"),0}}); // Try to initialize it.
 
 void substrFeature::set(char* tokenS, size_t length){
 	memcpy(stringL,tokenS,strlen(tokenS)+1);
@@ -55,8 +55,7 @@ void substrFeature::set(char* tokenS, size_t length){
 	cout<<token<<endl;
 	cout<<"size: "<<tokenDict.size()<<endl;
 	size_t wordindex=0;
-	if(tokenDict.find((string)token) == tokenDict.end()){
-	//if(tokenDict.count((string)token)==0){
+	if(tokenDict.count((string)token)==0){
 		//cout<<"set21"<<endl;
 		wordindex=substrFeature::tokenDict.size();
 		substrFeature::tokenDict.insert(pair<string,size_t>(token,wordindex));
