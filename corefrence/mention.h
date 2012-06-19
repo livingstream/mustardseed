@@ -120,13 +120,11 @@ class mention {
         substrFeature substrf;
         lengthFeature lengthf;
         mention(){
-	  int i=0;
-          for(i=0;i<maxtokenlen;i++)
-	    stringL[i]='\0';
+          memset(stringL,'\0',maxtokenlen);
           len=0;doc=0;para=0;word=0;pos=0;entityId=0;
         }
         void set(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
-           memcpy(this->stringL,str,min(maxtokenlen,(int)strlen(str)+1));
+           memcpy(this->stringL,str,min(maxtokenlen-1,(int)strlen(str)));
            this->len=length;
            this->doc=doc_id;
            this->para=para_id;
