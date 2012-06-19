@@ -15,12 +15,12 @@
 #include "mention.h"
 #include "entity.h"
 using namespace std;
-#define Nmen 3000 // number of mentions
+#define Nmen 300000 // number of mentions
 //#define Nmen 3000 // number of mentions
 #define Niter 200000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
-#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
-//#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+//#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
+#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
 #define DEBUG false
 
 entity entityArray[Nmen];
