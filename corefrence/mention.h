@@ -131,15 +131,10 @@ public:
         entityId=0;
     }
     void set(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id) {
-        memcpy(stringL,str,min(maxtokenlen-1,(int)strlen(str)));
-        len=length;
-        doc=doc_id;
-        para=para_id;
-        word=word_id;
-        pos=pos_id;
-        entityId=entity_id;
+        memcpy(stringL,str,length);
+        len=length; doc=doc_id; para=para_id; word=word_id; pos=pos_id; entityId=entity_id;
         char temp[3]= {'\0'};
-        memcpy(temp,str,min(3,(int)strlen(str)));
+        memcpy(temp,str,min(3,length);
         prefixf.set(temp[0],temp[1],temp[2]);
         substrf.set(str,length);
         lengthf.set(length);
