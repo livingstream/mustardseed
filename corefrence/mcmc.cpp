@@ -97,8 +97,8 @@ int main ()
                 word_num=atoi(word.c_str());
             else if(i==3) {
                 transform(word.begin(),word.end(),word.begin(),::tolower);
-                str_len=word.size();
-                memcpy(tmpS,word.c_str(),min(maxtokenlen-1,(int)strlen(word.c_str())));
+                str_len=min(maxtokenlen-1,(int)strlen(word.c_str()));
+                memcpy(tmpS,word.c_str(),str_len);
                 if(literalMap.count(word)==0) {
                     dest_entity=literalMap.size();
                     literalMap.insert(pair<string,int>(word,dest_entity));
