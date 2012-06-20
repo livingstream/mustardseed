@@ -135,7 +135,7 @@ int main ()
         }
         int loss=0;
         int gain=0;
-        //calculate gain
+        //calculate loss
         for(auto it=entityArray[source_entity].othersmentionSet.begin(); it!=entityArray[source_entity].othersmentionSet.end(); ++it)
             if(source_mention!=*it)
                 loss+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
@@ -149,8 +149,8 @@ int main ()
                 else loss+=single_score*(count-1);
             }
         }
-        //end calculate gain
-        //calcuate loss
+        //end calculate loss
+        //calcuate gain
         for(auto it=entityArray[dest_entity].othersmentionSet.begin(); it!=entityArray[dest_entity].othersmentionSet.end(); ++it)
             gain+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
         for(int i=0; i<group_size; i++) {
@@ -163,7 +163,7 @@ int main ()
                 else gain+=single_score*(count-1);
             }
         }
-        //end calculate loss
+        //end calculate gain
         //accept or not
         if(gain>loss) { // we should accept it
             accept=true;
