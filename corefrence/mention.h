@@ -53,21 +53,18 @@ public:
 unordered_map<string,int> substrFeature::tokenDict( {{string("NULL"),0}, {string("NULL"),0}}); // Try to initialize it.
 
 void substrFeature::set(char* tokenS, size_t length) {
-    memcpy(stringL,tokenS,strlen(tokenS)+1);
+    memcpy(stringL,tokenS,length);
     len=length;
     char* token = strtok(tokenS, " ");
-    //cout<<token<<endl;
-    //cout<<"size: "<<tokenDict.size()<<endl;
     size_t wordindex=0;
     if(tokenDict.count((string)token)==0) {
-        //cout<<"set21"<<endl;
         wordindex=substrFeature::tokenDict.size();
         substrFeature::tokenDict.insert(pair<string,size_t>(token,wordindex));
     } else {
         wordindex=substrFeature::tokenDict.find(token)->second;
     }
     tokenIntArray[0]=wordindex;
-    memcpy(tokenArray[0],token,min(maxtokenlen,(int)strlen(token)+1));
+    memcpy(tokenArray[0],token,min(maxtokenlen-1,(int)strlen(token)));
     token_size=1;
     while (token_size<maxtoken && token) {
         token = strtok(NULL, " ");
@@ -80,8 +77,7 @@ void substrFeature::set(char* tokenS, size_t length) {
                 wordindex=substrFeature::tokenDict.find(token)->second;
             }
             tokenIntArray[token_size]=wordindex;
-
-            memcpy(substrFeature::tokenArray[token_size],token,min(maxtokenlen,(int)strlen(token)+1));
+            memcpy(substrFeature::tokenArray[token_size],token,min(maxtokenlen-1,(int)strlen(token)));
             token_size++;
         }
     }
@@ -134,7 +130,7 @@ public:
         memcpy(stringL,str,length);
         len=length; doc=doc_id; para=para_id; word=word_id; pos=pos_id; entityId=entity_id;
         char temp[3]= {'\0'};
-        memcpy(temp,str,min(3,length);
+        memcpy(temp,str,min(3,length));
         prefixf.set(temp[0],temp[1],temp[2]);
         substrf.set(str,length);
         lengthf.set(length);
