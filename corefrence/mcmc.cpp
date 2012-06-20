@@ -16,7 +16,7 @@
 using namespace std;
 #define Nmen 300000 // number of mentions
 //#define Nmen 3000 // number of mentions
-#define Niter 200000 // number of iterations
+#define Niter 20000000 // number of iterations
 #define bias 0 // affinity score and replusion score bais
 //#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
 #define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
@@ -194,6 +194,7 @@ int main ()
 	endTime=time (NULL);
 	cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
 	cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
+	cout << "iter: " << iter << ", endtime: " << endTime << ", beginTime: " << beginTime << endl;
 	cout<<"speed="<<iter/(endTime-beginTime)<<endl;
 	return 0;
 }

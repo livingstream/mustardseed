@@ -7,7 +7,7 @@ using namespace std;
 #define maxtokenlen 50
 #define Nmen 300000 // number of mentions
 //#define Nmen 3000 // number of mentions
-#define Niter 200000 // number of iterations
+#define Niter 20000000 // number of iterations
 
 class prefixFeature {
 	public:
@@ -54,8 +54,8 @@ void substrFeature::set(char* tokenS, size_t length){
 	memcpy(stringL,tokenS,strlen(tokenS)+1);
 	len=length;
 	char* token = strtok(tokenS, " ");
-	cout<<token<<endl;
-	cout<<"size: "<<tokenDict.size()<<endl;
+	//cout<<token<<endl;
+	//cout<<"size: "<<tokenDict.size()<<endl;
 	size_t wordindex=0;
 	if(tokenDict.count((string)token)==0){
 		//cout<<"set21"<<endl;
