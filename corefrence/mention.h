@@ -5,6 +5,9 @@
 using namespace std;
 #define maxtoken 10
 #define maxtokenlen 50
+#define Nmen 300000 // number of mentions
+//#define Nmen 3000 // number of mentions
+#define Niter 200000 // number of iterations
 
 class prefixFeature {
 	public:

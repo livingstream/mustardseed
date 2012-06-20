@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <exception>
 #include <assert.h>
-#include "mention.h"
 #include "entity.h"
 using namespace std;
 #define Nmen 300000 // number of mentions
@@ -24,7 +23,7 @@ using namespace std;
 #define DEBUG false
 
 entity entityArray[Nmen];
-mention mentionArray[Nmen];
+//mention mentionArray[Nmen];
 
 void printMention(const mention& mm, bool debug = DEBUG) {
 	if(debug) {
@@ -111,7 +110,7 @@ int main ()
 			i++;
 		}
 		mentionArray[mentionInter].set(tmpS,str_len,doc_id,para_id,word_num,0,dest_entity);
-		entityArray[dest_entity].insert(mentionInter,tmpS);
+		entityArray[dest_entity].insert(mentionInter);
 		mentionInter++;
 	}
 
@@ -132,10 +131,35 @@ int main ()
 			dest_entity=findEmptyEntity(source_entity);
 		}
 		int loss=0; int gain=0;
-		for(auto it=entityArray[source_entity].mentionSet.begin();it!=entityArray[source_entity].mentionSet.end();++it)
-			loss+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
-		for(auto it=entityArray[dest_entity].mentionSet.begin();it!=entityArray[dest_entity].mentionSet.end();++it)
+                //calculate gain 
+		for(auto it=entityArray[source_entity].othersmentionSet.begin();it!=entityArray[source_entity].othersmentionSet.end();++it)
+                   if(source_mention!=*it)
+		      loss+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
+                for(int i=0;i<group_size;i++){
+                   int count=entityArray[source_entity].token_freq[i].count;
+                   if(count>0){
+                     auto it =entityArray[source_entity].group_set[i].begin();
+                     int single_score=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
+                     if(entityArray[source_entity].group_set[i].count(source_mention)==0)
+                        loss+=single_score*count;		   
+                     else loss+=single_score*(count-1);
+                   }
+                }
+                //end calculate gain
+                //calcuate loss
+		for(auto it=entityArray[dest_entity].othersmentionSet.begin();it!=entityArray[dest_entity].othersmentionSet.end();++it)
 			gain+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
+                for(int i=0;i<group_size;i++){
+                   int count=entityArray[dest_entity].token_freq[i].count;
+                   if(count>0){
+                     auto it =entityArray[dest_entity].group_set[i].begin();
+                     int single_score=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
+                     if(entityArray[dest_entity].group_set[i].count(source_mention)==0)
+                        gain+=single_score*count;		   
+                     else gain+=single_score*(count-1);
+                   }
+                }
+                //end calculate loss
 		//accept or not
 		if(gain>loss){// we should accept it
 			accept=true;
@@ -155,7 +179,14 @@ int main ()
 				cerr << "------------------------------------\n";
 			}
 			entityArray[mentionArray[source_mention].entityId].mentionSet.erase(source_mention);
-			entityArray[dest_entity].mentionSet.insert(source_mention);
+			entityArray[mentionArray[source_mention].entityId].othersmentionSet.erase(source_mention);
+                        for(int i=0;i<group_size;i++){
+				if(entityArray[source_entity].group_set[i].count(source_mention)>0){
+                                   entityArray[source_entity].token_freq[i].count--;
+                                   entityArray[source_entity].group_set[i].erase(source_mention);
+                                }
+                        }
+			entityArray[dest_entity].insert(source_mention);
 			mentionArray[source_mention].entityId=dest_entity;
 			currentEntropy=currentEntropy+gain-loss;
 		}

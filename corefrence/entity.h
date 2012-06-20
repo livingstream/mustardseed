@@ -1,9 +1,12 @@
 #include <unordered_set>
+#include "mention.h"
 using namespace std;
 #define clusterPrefixW (10)
 #define clusterSameDocW (10)
 #define maxtokenlen 50
 #define group_size 4
+mention mentionArray[Nmen];
+
 class clusterPrefixF {
 	public:
           bool same_prfeix;
@@ -50,20 +53,23 @@ class entity {
         size_t id; // An unique identifier for the entity (in consequential)
         unordered_set<size_t> mentionSet; // all the mentions belong to the entity   
         unordered_set<size_t> othersmentionSet; // all the mentions belong to the entity   
-        token_count tokenFreq[group_size];
+        token_count token_freq[group_size];
+        unordered_set<size_t> group_set[group_size];
         clusterPrefixF clusterPrefixf;
         clusterSameDocF clusterSameDocf;
-        void insert(int mentionId, char* tokenS){
+        void insert(int mentionId){
                 bool found=false;
         	mentionSet.insert(mentionId); 
                 for(int i=0;i<group_size;i++){
-			if(tokenFreq[i].count==0){
-                           tokenFreq[i].count=1;
-                           memcpy(tokenFreq[i].token,tokenS,strlen(tokenS));
+			if(token_freq[i].count==0){
+                           token_freq[i].count=1;
+                           memcpy(token_freq[i].token,mentionArray[mentionId].stringL,strlen(mentionArray[mentionId].stringL));
+                           group_set[i].insert(mentionId);
                            found=true;
                            break;
-                        } else if (memcmp(tokenS,tokenFreq[i].token,maxtokenlen-1)==0){
-		           tokenFreq[i].count++;
+                        } else if (memcmp(mentionArray[mentionId].stringL,token_freq[i].token,maxtokenlen-1)==0){
+		           token_freq[i].count++;
+                           group_set[i].insert(mentionId);
 			   found=true;
                            break;
                         }
@@ -76,8 +82,8 @@ class entity {
         entity(){
 	  id=0;
           for(int i=0; i<group_size; i++){
-		memset(tokenFreq[i].token,'\0',maxtokenlen);
-		tokenFreq[i].count=0;
+		memset(token_freq[i].token,'\0',maxtokenlen);
+		token_freq[i].count=0;
           }
         }
 };
