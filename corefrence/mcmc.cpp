@@ -87,9 +87,9 @@ int main ()
 		while( getline(stream, word, ',') ){
 			if(i==0){
 				const char* cword = word.c_str();
-				char s816[9] = {'\0', '\0', '\0', '\0','\0', '\0', '\0', '\0','\0'};
+				char s816[9] = {'\0'};
 				strncpy(s816, cword+8, 8);
-				char s1721[5] = {'\0', '\0', '\0', '\0','\0',}; 
+				char s1721[5] = {'\0'}; 
 				strncpy(s1721, cword+17, 4);
 				doc_id=(atoi(s816)-19920000)*10000+atoi(s1721);
 			}
