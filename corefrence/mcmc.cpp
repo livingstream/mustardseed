@@ -62,8 +62,7 @@ size_t findEmptyEntity(size_t sourceId) {
 
 int main ()
 {
-    size_t k=0;
-    for(k=0; k<Nmen; k++) entityArray[k].id=k;
+    for(size_t k=0; k<Nmen; k++) entityArray[k].id=k;
 
     size_t currentEntropy=1;
     unordered_map<string,int> literalMap( {{string("NULL"),0}, {string("NULL"),0}});
