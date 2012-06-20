@@ -135,7 +135,8 @@ int main ()
         int loss=0;
         int gain=0;
         //calculate loss
-        for(auto it=entityArray[source_entity].othersmentionSet.begin(); it!=entityArray[source_entity].othersmentionSet.end(); ++it)
+        unordered_set<size_t> source_othersmentionSet = entityArray[source_entity].othersmentionSet;
+        for(auto it=source_othersmentionSet.begin(); it!=source_othersmentionSet.end(); ++it)
             if(source_mention!=*it)
                 loss+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
         for(int i=0; i<group_size; i++) {
@@ -150,7 +151,8 @@ int main ()
         }
         //end calculate loss
         //calcuate gain
-        for(auto it=entityArray[dest_entity].othersmentionSet.begin(); it!=entityArray[dest_entity].othersmentionSet.end(); ++it)
+        unordered_set<size_t> dest_othersmentionSet = entityArray[dest_entity].othersmentionSet;
+        for(auto it=dest_othersmentionSet.begin(); it!=dest_othersmentionSet.end(); ++it)
             gain+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
         for(int i=0; i<group_size; i++) {
             int count=entityArray[dest_entity].token_freq[i].count;
