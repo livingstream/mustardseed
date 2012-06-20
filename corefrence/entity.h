@@ -8,12 +8,12 @@ using namespace std;
 #define group_size 4
 mention mentionArray[Nmen];
 
-class clusterPrefixF {
+class c_sameprefix_f {
 public:
     bool same_prfeix;
     unordered_set<size_t>prefixSet;
     int prefix[256];
-    clusterPrefixF() {
+    c_sameprefix_f() {
         memset(prefix,0, sizeof(prefix) * sizeof(int));
     }
     void add(int char_ascii) {
@@ -24,12 +24,17 @@ public:
         prefix[char_ascii]--;
         if(prefix[char_ascii]==0) prefixSet.erase(char_ascii);
     }
-    int clusterPrefixScore() {
-        return prefixSet.size()==1 ? clusterPrefixW : 0;
+    int pre_add_score() {
+        return 0;
+        //return prefixSet.size()==1 ? clusterPrefixW : 0;
+    }
+    int pre_remove_score() {
+        return 0;
+        //return prefixSet.size()==1 ? clusterPrefixW : 0;
     }
 };
 
-class clusterSameDocF {
+class c_samedoc_f {
 public:
     unordered_map<size_t,size_t> docMap;
     void add(int doc_id) {
@@ -39,8 +44,31 @@ public:
         docMap[doc_id]=docMap[doc_id]-1;
         if(docMap[doc_id]==0) docMap.erase(doc_id);
     }
-    int clusterSameDocScore() {
-        return docMap.size()==1 ? clusterSameDocW : 0;
+    int pre_add_score() {
+        return 0;
+        //return docMap.size()==1 ? clusterSameDocW : 0;
+    }
+    int pre_remove_score() {
+        return 0;
+    }
+};
+
+class c_samepos_f {
+public:
+    unordered_map<size_t,size_t> posMap;
+    void add(int doc_id) {
+        posMap[doc_id]=posMap[doc_id]+1;
+    }
+    void remove(size_t doc_id) {
+        posMap[doc_id]=posMap[doc_id]-1;
+        if(posMap[doc_id]==0) posMap.erase(doc_id);
+    }
+    int pre_add_score() {
+        //return posMap.size()==1 ? clusterSameDocW : 0;
+        return 0;
+    }
+    int pre_remove_score() {	
+	return 0;
     }
 };
 
@@ -56,8 +84,9 @@ public:
     unordered_set<size_t> othersmentionSet; // all the mentions belong to the entity
     token_count token_freq[group_size];
     unordered_set<size_t> group_set[group_size];
-    clusterPrefixF clusterPrefixf;
-    clusterSameDocF clusterSameDocf;
+    c_sameprefix_f prefixf;
+    c_samedoc_f docf;
+    c_samepos_f posf;
     void insert(int mentionId) {
         bool found=false;
         mentionSet.insert(mentionId);
@@ -79,8 +108,11 @@ public:
         }
         if(!found) othersmentionSet.insert(mentionId);
     }
-    int clusterScore() {
-        return clusterPrefixf.clusterPrefixScore()+clusterSameDocf.clusterSameDocScore();
+    int pre_add_score() {
+        return prefixf.pre_add_score()+docf.pre_add_score()+posf.pre_add_score();
+    }
+    int pre_remove_score() {
+        return prefixf.pre_remove_score()+docf.pre_remove_score()+posf.pre_remove_score();
     }
     entity() {
         id=0;
