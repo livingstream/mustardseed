@@ -1,4 +1,5 @@
 #include <unordered_set>
+#include <assert.h>
 #include "mention.h"
 using namespace std;
 #define clusterPrefixW (10)
@@ -63,11 +64,13 @@ public:
         for(int i=0; i<group_size; i++) {
             if(token_freq[i].count==0) {
                 token_freq[i].count=1;
-                memcpy(token_freq[i].token,mentionArray[mentionId].stringL,strlen(mentionArray[mentionId].stringL));
+                memset(token_freq[i].token,'\0',maxtokenlen);
+                memcpy(token_freq[i].token,mentionArray[mentionId].stringL,mentionArray[mentionId].len);
+                assert(group_set[i].size()==0);
                 group_set[i].insert(mentionId);
                 found=true;
                 break;
-            } else if (memcmp(mentionArray[mentionId].stringL,token_freq[i].token,maxtokenlen-1)==0) {
+            } else if (memcmp(mentionArray[mentionId].stringL,token_freq[i].token,maxtokenlen)==0) {
                 token_freq[i].count++;
                 group_set[i].insert(mentionId);
                 found=true;
