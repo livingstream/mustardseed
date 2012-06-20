@@ -20,7 +20,7 @@ class prefixFeature {
             thirdC=third;
           }
           int prefixScore(prefixFeature& other){
-            return this->firstC==other.firstC ? (1+(this->secondC==other.secondC ? ((this->thirdC==other.thirdC ? 3 : 0)+2) : -1)): -1;
+            return firstC==other.firstC ? (1+(secondC==other.secondC ? ((thirdC==other.thirdC ? 3 : 0)+2) : -1)): -1;
           }
 };
 
@@ -33,9 +33,8 @@ class substrFeature {
           int len;
           int token_size;
           substrFeature(){
-            int i=0;
             memset(stringL,'\0',maxtokenlen);
-            for(i=0;i<maxtoken;i++){
+            for(int i=0;i<maxtoken;i++){
             	tokenIntArray[i]=0;
                 memset(tokenArray[i],'\0',maxtokenlen);
             }
@@ -50,7 +49,7 @@ unordered_map<string,int> substrFeature::tokenDict({{string("NULL"),0}, {string(
 
 void substrFeature::set(char* tokenS, size_t length){
 	memcpy(stringL,tokenS,strlen(tokenS)+1);
-	this->len=length;
+	len=length;
 	char* token = strtok(tokenS, " ");
 	cout<<token<<endl;
 	cout<<"size: "<<tokenDict.size()<<endl;
@@ -84,12 +83,10 @@ void substrFeature::set(char* tokenS, size_t length){
 }
 
 int substrFeature::substrScore(substrFeature& other){
-	int i=0,j=0;
-	//one string is a substring of the second string
-	int sum=this->len>=other.len ? (strstr(this->stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,this->stringL)==NULL ? -1 : 10);
-	for(i=0;i<this->token_size;i++)
-		for(j=0;j<other.token_size;j++)
-			sum+=(this->tokenIntArray[i]!=other.tokenIntArray[j] ? -1:10);
+	int sum=len>=other.len ? (strstr(stringL,other.stringL)==NULL ? -1 : 10) : (strstr(other.stringL,stringL)==NULL ? -1 : 10);
+	for(int i=0;i<token_size;i++)
+		for(int j=0;j<other.token_size;j++)
+			sum+=(tokenIntArray[i]!=other.tokenIntArray[j] ? -1:10);
 	return sum;
 }
 
@@ -100,10 +97,10 @@ class lengthFeature {
 	  length=0;
         }
         void set(size_t len){
-          this->length=len;
+          length=len;
         }
         int lengthScore(lengthFeature & other){
-          return this->length==other.length ? 3 : 0;
+          return length==other.length ? 3 : 0;
         }
 };
 
@@ -124,14 +121,10 @@ class mention {
           len=0;doc=0;para=0;word=0;pos=0;entityId=0;
         }
         void set(char*str, int length, int doc_id, int para_id, int word_id, int pos_id, int entity_id){
-           memcpy(this->stringL,str,min(maxtokenlen-1,(int)strlen(str)));
-           this->len=length;
-           this->doc=doc_id;
-           this->para=para_id;
-           this->word=word_id;
-           this->pos=pos_id;
-           this->entityId=entity_id;
-           char temp[4]={'\0','\0','\0','\0'};
+           memcpy(stringL,str,min(maxtokenlen-1,(int)strlen(str)));
+           len=length; doc=doc_id; para=para_id; word=word_id; pos=pos_id; entityId=entity_id;
+           char temp[3]={'\0'};
+           memcpy(temp,str,min(3,(int)strlen(str)));
            prefixf.set(temp[0],temp[1],temp[2]);
            substrf.set(str,length);
            lengthf.set(length);

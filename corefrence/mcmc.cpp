@@ -45,37 +45,34 @@ void printEntity(const entity& e, const mention* ml, bool debug = DEBUG) {
 }
 
 size_t findNonEmptyEntity(size_t sourceId){
-	size_t randomEntity=-1;
+	size_t dest_entity=-1;
 	while(true){
-		randomEntity=rand()%Nmen;
-		if(entityArray[randomEntity].mentionSet.size()>0 && randomEntity!=sourceId)
-			return randomEntity;
+		dest_entity=rand()%Nmen;
+		if(entityArray[dest_entity].mentionSet.size()>0 && dest_entity!=sourceId)
+			return dest_entity;
 	}
 }
 
 size_t findEmptyEntity(size_t sourceId){
-	size_t randomEntity=-1;
+	size_t dest_entity=-1;
 	while(true){
-		randomEntity=rand()%Nmen;
-		if(entityArray[randomEntity].mentionSet.size()==0 && randomEntity!=sourceId)
-			return randomEntity;
+		dest_entity=rand()%Nmen;
+		if(entityArray[dest_entity].mentionSet.size()==0 && dest_entity!=sourceId)
+			return dest_entity;
 	}
 }
 
 int main ()
 {
 	size_t k=0;
-	for(k=0;k<Nmen;k++)
-		entityArray[k].id=k;
+	for(k=0;k<Nmen;k++) entityArray[k].id=k;
 
 	size_t currentEntropy=1;
 	unordered_map<string,int> literalMap({{string("NULL"),0}, {string("NULL"),0}});
-	// read data from nyt dataset 
 	ifstream namefile(nytdatapath);
 	string input;
 	if(!namefile.is_open()){
-		cerr << "Error opening file";
-		exit(EXIT_FAILURE);
+		cerr << "Error opening file"; exit(EXIT_FAILURE);
 	}
 	getline(namefile,input,'\n'); //Ignore the header row
 
@@ -84,25 +81,17 @@ int main ()
 		getline(namefile,input,'\n');
 		string word;
 		stringstream stream(input);
-		size_t i=0, doc_id, para_id, word_num, str_len, dest_entity;
-		char tmpS[maxtokenlen+1];
-		memset(tmpS,'\0',maxtokenlen+1);
+		size_t i=0, doc_id=-1, para_id=-1, word_num=-1, str_len=-1, dest_entity=-1;
+		char tmpS[maxtokenlen];
+		memset(tmpS,'\0',maxtokenlen);
 		while( getline(stream, word, ',') ){
 			if(i==0){
-				//extract the integer docid from string
-				//const string s816(9, '\0');
-				//const string s1721(5, '\0' );
-				//s816.assign(word, 8,16);
-				//s1721.assign(word, 17,21);
-				//const string s816 = word.assign(word, 8,16);
-				//const string s1721 = word.assign(word, 17,21);
 				const char* cword = word.c_str();
 				char s816[9] = {'\0', '\0', '\0', '\0','\0', '\0', '\0', '\0','\0'};
 				strncpy(s816, cword+8, 8);
 				char s1721[5] = {'\0', '\0', '\0', '\0','\0',}; 
 				strncpy(s1721, cword+17, 4);
 				doc_id=(atoi(s816)-19920000)*10000+atoi(s1721);
-				//doc_id=(atoi(s816.c_str())-19920000)*10000+atoi(s1721.c_str());
 			}
 			else if(i==1)
 				para_id=atoi(word.c_str());
@@ -111,7 +100,7 @@ int main ()
 			else if(i==3){
 				transform(word.begin(),word.end(),word.begin(),::tolower);
 				str_len=word.size();
-				memcpy(tmpS,word.c_str(),min(maxtokenlen,(int)strlen(word.c_str())+1));
+				memcpy(tmpS,word.c_str(),min(maxtokenlen-1,(int)strlen(word.c_str())));
 				if(literalMap.count(word)==0){
 					dest_entity=literalMap.size();
 					literalMap.insert(pair<string,int>(word,dest_entity)); 
@@ -122,41 +111,31 @@ int main ()
 			i++;
 		}
 		mentionArray[mentionInter].set(tmpS,str_len,doc_id,para_id,word_num,0,dest_entity);
-		entityArray[dest_entity].mentionSet.insert(mentionInter);
+		entityArray[dest_entity].insert(mentionInter,tmpS);
 		mentionInter++;
 	}
 
 	namefile.close();
-	//propose a change 
 	size_t iter=0;
-	size_t randomMention=0;
-	size_t randomEntity=0;
 	size_t accepted=0;
 	srand((unsigned)time(0));
 	time_t beginTime, endTime;
 	beginTime = time (NULL);
 	while(iter<Niter){
 		iter=iter+1;
-		randomMention=(rand()%Nmen);//random mention range from 0 to Nmen-1
-		randomEntity=-1;
-		if(entityArray[mentionArray[randomMention].entityId].mentionSet.size()==1||
-				((double)rand()/(double)RAND_MAX)<=0.8){
-			randomEntity=findNonEmptyEntity(mentionArray[randomMention].entityId);
+		size_t source_mention; size_t source_entity=-1; size_t dest_entity=-1; bool accept=false;
+		source_mention=(rand()%Nmen);//random mention range from 0 to Nmen-1
+                source_entity=mentionArray[source_mention].entityId;
+		if(entityArray[source_entity].mentionSet.size()==1||((double)rand()/(double)RAND_MAX)<=0.8){
+			dest_entity=findNonEmptyEntity(source_entity);
 		} else{ // place it in an empty or create a new entity
-			randomEntity=findEmptyEntity(mentionArray[randomMention].entityId);
+			dest_entity=findEmptyEntity(source_entity);
 		}
-		unordered_set<size_t>::iterator it;
-		int loss=0;
-		for(it=entityArray[mentionArray[randomMention].entityId].mentionSet.begin();it!=
-				entityArray[mentionArray[randomMention].entityId].mentionSet.end();++it){
-			loss+=mentionArray[randomMention].pairwiseScore(mentionArray[*it]);
-		}
-		int gain=0;
-		for(it=entityArray[randomEntity].mentionSet.begin();it!=
-				entityArray[randomEntity].mentionSet.end();++it){
-			gain+=mentionArray[randomMention].pairwiseScore(mentionArray[*it]);
-		}
-		bool accept=false;
+		int loss=0; int gain=0;
+		for(auto it=entityArray[source_entity].mentionSet.begin();it!=entityArray[source_entity].mentionSet.end();++it)
+			loss+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
+		for(auto it=entityArray[dest_entity].mentionSet.begin();it!=entityArray[dest_entity].mentionSet.end();++it)
+			gain+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
 		//accept or not
 		if(gain>loss){// we should accept it
 			accept=true;
@@ -164,22 +143,20 @@ int main ()
 		else {// accept it with a probablity
 			double ratio=exp(gain-loss);
 			double p=((double)rand()/(double)RAND_MAX);
-			if(ratio>p){// accept it
-				accept=true;
-			}
+			if(ratio>p) accept=true;
 		}
 		if(accept){
 			accepted+=1;
 			//remove the mention from old entity and place it into the new entity
 			if(DEBUG) {
-				cerr << "Mention to move: "; printMention(mentionArray[randomMention]); cerr << "\n";
-				cerr << "From Entity: "; printEntity(entityArray[mentionArray[randomMention].entityId], mentionArray); cerr << "\n";
-				cerr << "To entity: "; printEntity(entityArray[randomEntity], mentionArray); cerr << "\n";
+				cerr << "Mention to move: "; printMention(mentionArray[source_mention]); cerr << "\n";
+				cerr << "From Entity: "; printEntity(entityArray[mentionArray[source_mention].entityId], mentionArray); cerr << "\n";
+				cerr << "To entity: "; printEntity(entityArray[dest_entity], mentionArray); cerr << "\n";
 				cerr << "------------------------------------\n";
 			}
-			entityArray[mentionArray[randomMention].entityId].mentionSet.erase(randomMention);
-			entityArray[randomEntity].mentionSet.insert(randomMention);
-			mentionArray[randomMention].entityId=randomEntity;
+			entityArray[mentionArray[source_mention].entityId].mentionSet.erase(source_mention);
+			entityArray[dest_entity].mentionSet.insert(source_mention);
+			mentionArray[source_mention].entityId=dest_entity;
 			currentEntropy=currentEntropy+gain-loss;
 		}
 	}
