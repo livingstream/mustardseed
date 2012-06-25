@@ -1,0 +1,189 @@
+%%%
+% Tech report template. Compile with pdflatex
+%%%
+%\documentclass[pdftext,twoside,12pt]{report}
+\documentclass[pdftext,twoside,11pt]{article}
+
+\usepackage[a4paper,lmargin=2.5cm,rmargin=2cm,tmargin=1cm,bmargin=1cm,includehead,includefoot]{geometry}
+\usepackage[german,english]{babel}
+\usepackage{url}
+\usepackage{subfig}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{amsmath} % needed for subequations
+\usepackage{amssymb}
+\usepackage{marvosym} % for the Euro symbol
+\usepackage{mathptmx}
+\usepackage{multirow}
+\usepackage[small,compact]{titlesec}  %for compressed Section titles
+\usepackage{mdwlist}  %for compressed itemized lists
+\usepackage{setspace} %for chaging spacing in environments (see biblio)
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[scaled=.90]{helvet}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} 
+\usepackage{pgf}
+\usepackage{hypernat}
+\usepackage{hyperref}
+
+%%% Package options %%%
+
+\hypersetup{colorlinks=true, breaklinks=true, pagebackref=true,
+  urlcolor=blue, linkcolor=blue,anchorcolor=blue,citecolor=blue,
+  pdfpagemode = UseNone, %FullScreen, %UseThumbs, %UseOutlines,
+  pdfauthor = {},
+  pdftitle = {},   
+  pdfsubject = {},
+  pdfkeywords = {}
+}
+
+\DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+\graphicspath{{img/} {./}} %put all figures in these dirs
+
+\urlstyle{rm} %so it doesn't use a typewriter font for urls.
+
+%\newcommand{\bibfont}{\scriptsize} %for smaller fonts in biblio
+
+\renewcommand{\captionfont}{\small \sffamily}
+
+\renewcommand\floatpagefraction{.9}
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}   
+
+\setlength{\bibsep}{1pt}           %for compressed itemized list on biblio
+\setlength{\topsep}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setcounter{totalnumber}{50}
+\setcounter{topnumber}{50}
+\setcounter{bottomnumber}{50}
+
+%Example of image declaration (declared once in pdf file, reduces file size)
+%\pgfdeclareimage[height=0.8cm]{logo}{img/logo} 
+%Use with:
+%\pgfuseimage{logo}
+
+% Headers and Footers
+\pagestyle{fancy}
+\fancyhead{} % reset headers
+\fancyfoot{} % reset footers
+\fancyhead[LO]{\textsf{\textbf{TITLE}}}
+\fancyhead[CO]{\date{\today}}
+\fancyhead[RO]{AUTHOR}
+% remove horizontal lines between text and headers and footers
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrulewidth}{0pt}
+
+
+%  Title page
+\title{Tech-Report Title}
+\author{AUTHOR\\
+  Institute for Neuroinformatics\\
+  University of Zurich and ETH Zurich\\
+  \url{EMAIL@ini.phys.ethz.ch}
+}
+\date{\today}
+
+
+\begin{document}
+
+%\thispagestyle{empty}
+\maketitle
+
+% Abstract
+\begin{abstract}
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+\end{abstract}
+% keywords
+
+% Use with {report} documentclass
+% \chapter{The beginning}
+% \label{cha:beginning}
+
+%----------------------------------------------------------%
+\section{Introduction}
+\label{sec:intro} 
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
+\begin{figure}
+  \centering
+%%% UN-COMMENT THE FOLLOWING LINE
+%  \includegraphics[width=0.8\textwidth]{FIGURE_FILENAME_NOEXTENSION}
+\caption{Single figure caption.} 
+\label{fig:FIGURE_LABEL}
+\end{figure}
+
+\subsection{This is a subsection}
+
+Itemized list:
+\begin{itemize}
+\item Lorem ipsum dolor sit amet
+\item consectetur adipisicing elit
+\item sed do eiusmod tempor incididunt ut labore et dolore magna
+  aliqua
+\end{itemize}
+
+Numbered list:
+\begin{enumerate}
+\item Lorem ipsum dolor sit amet
+\item consectetur adipisicing elit
+\item sed do eiusmod tempor incididunt ut labore et dolore magna
+  aliqua
+\end{enumerate}
+
+\begin{figure} %use {figure*} in twocolumn mode
+  \begin{tabular}[]{m{0.45\textwidth} @{\hspace{0.1\textwidth}} m{0.45\textwidth}}
+    %%% Replace empty subfloat command with proper one
+    \subfloat[]{
+      % \subfloat[]{\includegraphics[width=0.45\textwidth]{name_without_extension}
+      \label{fig:FIGURE_A_LABEL}} &
+    \subfloat[]{
+      % \subfloat[]{\includegraphics[width=0.45\textwidth]{name_without_extension}
+      \label{fig:FIGURE_B_LABEL}}
+  \end{tabular}
+  \caption{(a) Subfigure caption;
+    (b) Subfigure caption}
+  \label{fig:FULL_FIGURE_LABEL}
+\end{figure} %use {figure*} in twocolumn mode
+
+%----------------------------------------------------------%
+\section{Conclusions}
+\label{sec:concl}
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
+%----------------------------------------------------------%
+\section*{Acknowledgment}
+This work was supported  by \ldots
+
+%----------------------------------------------------------%
+\bibliographystyle{plainnat}
+\bibliography{biblio}
+
+
+\end{document}
+
