@@ -1,7 +1,0 @@
-\beamer@endinputifotherversion {3.10pt}
-\select@language {british}
-\beamer@sectionintoc {1}{Introduction}{3}{0}{1}
-\beamer@sectionintoc {2}{Background information}{4}{0}{2}
-\beamer@sectionintoc {3}{The important things}{5}{0}{3}
-\beamer@sectionintoc {4}{Analysis of the work}{6}{0}{4}
-\beamer@sectionintoc {5}{Conclusion}{7}{0}{5}
