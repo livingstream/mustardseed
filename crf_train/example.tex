@@ -7,10 +7,7 @@
 %  - first a short version which is visible at the bottom of each slide;
 %  - second the full title shown on the title slide;
 \title[RU style for Beamer]{
-  Radboud University style for Beamer \LaTeX}
-
-% Optional: a subtitle to be dispalyed on the title slide
-\subtitle{Show where you're from}
+  Linear-chain CRF for NLP in MADlib}
 
 % The author(s) of the presentation:
 %  - again first a short version to be displayed at the bottom;
@@ -31,9 +28,7 @@
 % Add a date and possibly the name of the event to the slides
 %  - again first a short version to be shown at the bottom of each slide
 %  - second the full date and event name for the title slide
-\date[slides Example 2010]{
-  the 1st example presentation 2010 \\
-  7th October 2010}
+\date[slides Example 2010]{\today}
 
 \begin{document}
 
@@ -57,10 +52,11 @@
   \frametitle{Introduction}
 
   \begin{itemize}
-    \item This is just a short example
-    \item The comments in the \LaTeX\ file are most important
-    \item This is just the result after running pdflatex
-    \item The style is based on the webpage \url{http://www.ru.nl/}
+    \item Conditional probability p(label sequence y|observation sequence x) rather than p(y,x)
+    \item Allow arbitrary, non-independent features of the observation sequence X. 
+    \item A CRF on (X,Y) is specified by a vector $f$ of local features and a corresponding weight vector
+          lambda.
+    \item Each local feature is either a $state feature s(y,x,i)$ or a transition feature t(y,y) 
   \end{itemize}
 \end{frame}
 
@@ -76,7 +72,8 @@
   \begin{block}{The basis}
     This style uses the following default styles:
     \begin{itemize}
-      \item split
+      \item The CRF's global feature vector for input sequence x and label sequence y is given by
+            $\mathbf{F}$(y,x)=
       \item whale
       \item rounded
       \item orchid
@@ -97,24 +94,34 @@
   \end{enumerate}
 \end{frame}
 
-\section{Analysis of the work}
+\section{Parallel Training CRFs in MADlib}
 
 \begin{frame}
-  \frametitle{Analysis of the work}
-
-  This style file gives your slides some nice Radboud branding.
-  When you know how to work with the Beamer package it is easy to use.
-  Just add:\\ ~~~$\backslash$usepackage$\{$ru$\}$ \\ at the top of your file.
+  \frametitle{Parallel Training CRFs in MADlib}
+  \fbox{%
+        \parbox{0.95\linewidth}{%
+\textcolor{green}{\bf Parallel CRF training algorithm}\\
+1.Evaluate the log-likelihood function and gradient vector\\
+$\ell_{\lambda_k}=\lambda F(y_k,x_k)-\log Z_\lambda(x_k)$(log-likelihood for doc. $k$)\\
+$\nabla \ell_{\lambda_k}=\lambda F(y_k,x_k)-E_{p\lambda(Y|x_k)}F(Y,x_k)$(gradient vector for doc. $k$)\\
+2.Sum up over all documents \\
+$\ell_\lambda=\sum_k\ell_{\lambda_k}-\frac{\lambda^2}{2\sigma ^2}+const$(log-likelihood for all docs.)\\
+$\nabla \ell_\lambda=\sum_k\nabla \ell_{\lambda_k}-\frac{\lambda}{\sigma ^2}$(gradient vector for all docs.)\\
+3.Perform LBFGS optimization, a variation of quasi-Newton algorithm\\
+$lbfgs(\lambda,\ell_\lambda,\nabla \ell_\lambda,Hessian,other args)$\\
+4.Repeat step 1 and step2 until stop condition is satisfied
+        }%
+}\\
 \end{frame}
 
-\section{Conclusion}
+\section{Conclusion and Future Work}
 
 \begin{frame}
-  \frametitle{Conclusion}
+  \frametitle{Conclusion and Future Work}
 
   \begin{itemize}
-    \item Easy to use
-    \item Good results
+    \item SELECT madlib.traindata\_textfex(ags)
+    \item SELECT madlib.linear\_crf\_training(ags)
   \end{itemize}
 \end{frame}
 
