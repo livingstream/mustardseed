@@ -205,6 +205,59 @@ frequency, duration, and reason for drug administration.
 \item 
 \end{itemize}
 
+\section{Mining free-text medical records, Pro AMIA Symp, 2001}
+\label{sec:intro} 
+LifeCode use NLP to extract from a free-text clinical notes:
+\begin{itemize}
+\item patient demograhics, cheif complaint, illness history, medical history of patient and parents.
+\item social history(tobacco,alcohol,drugs,living aggrangement), the nature and extent of the examincation performed by phys.
+\item the nature and extent of old records consulted, professonal consultation and medical tests.
+\item final diagnoses. potentially also including possbile and ruled-out diagnoses. 
+\item the course of treatment including surgical procedures, drug therapy, and monitoring levels. 
+\item the serverity of the patinet's condition interms of the phys's stated conclusions and as measured by co-morbidities and the nature and course of treatment.
+\item the disposition of the patient at the end of the clinical encounter with the physician.
+\end{itemize}
+Use domain knowledge to determin
+\begin{itemize}
+\item the most specific version of each diagnosis and procedure
+\item the risk to the patient presented by the medical condition and treatment.
+\item the complexity of the medical decision making for the phys.
+\item the level of service provided by the physician and the information can be directly reported and that may require validation.
+\end{itemize}
+
+\section{Approaches to Text Mining for Clinical Medical Records,
+Proceedings of the 2006 ACM symposium on Applied computing, 2006}
+\label{sec:intro} 
+\begin{itemize}
+\item describe a MEDical Information Extraction (MedIE) system 
+that extracts and mines a variety of patient information with 
+breast complaints from free-text clinical record
+\item identify synonyms using UMLS 
+(e.g. high blood pressure is a synonym of hypertension) of these 
+predefined diseases. This task is simply completed by lookup of 
+synonyms in ontology 
+\item Graph-based Relation Extraction 
+The relation extraction refers to a task that finds pairs of two 
+terms in text (usually in a sentence or a couple of consecutive 
+sentences) that are semantically or syntactically related to each 
+other. Most information extraction (IE) tasks in this project are 
+relation extraction or could be transformed to relation extraction 
+problem. One type of information for extraction is numeric 
+attribute, such as blood pressure, pulse, age and weight of a 
+patient. We propose a graph-based approach for  the  extraction  of 
+syntactic relation based on the linkage information produced by
+Link Grammar Parser [14]. Link Grammar is an original sentence 
+parser, producing not only a constituent tree as most parsers yield, 
+but  also  a linkage diagram that  consists of links between two 
+words. Example: “Blood pressure is 144/90, pulse of 84, temperature of 98.3, 
+and weight of 154 pound.”
+\item Decision Trees Based Text Classification\\
+“She quit smoking five years ago” (former)
+“She is currently a smoker” (current)
+“None” (never)
+“She has never smoked” (never)
+\end{itemize}
+
 %----------------------------------------------------------%
 
 \end{document}
