@@ -50,7 +50,6 @@
 
 \begin{frame}
   \frametitle{Introduction}
-
   \begin{itemize}
     \item Conditional probability p(label sequence y|observation sequence x) rather than p(y,x)
     \item Allow arbitrary, non-independent features of the observation sequence X. 
@@ -59,42 +58,56 @@
     \item Each local feature is either a $state feature s(y,x,i)$ or a transition feature t(y,y) 
   \end{itemize}
 \end{frame}
-
-\section{Background information}
-
 \begin{frame}
-  \frametitle{Background information}
-
-  \begin{block}{Slides with \LaTeX}
-    Beamer offers a lot of functions to create nice slides using \LaTeX.
-  \end{block}
-
-  \begin{block}{The basis}
-    This style uses the following default styles:
-    \begin{itemize}
-      \item The CRF's global feature vector for input sequence x and label sequence y is given by
-            $\mathbf{F}$(y,x)=
-      \item whale
-      \item rounded
-      \item orchid
-    \end{itemize}
-  \end{block}
+  \frametitle{Introduction}
+  \begin{center}
+  \includegraphics[height=10em, width=20em]{crf.jpg}
+  \end{center}
 \end{frame}
 
-\section{The important things}
+\section{System Achitecture}
 
 \begin{frame}
-  \frametitle{The important things}
-
-  \begin{enumerate}
-    \item This just shows the effect of the style
-    \item It is not a Beamer tutorial
-    \item Read the Beamer manual for more help
-    \item Contact me only concerning the style file
-  \end{enumerate}
+  \frametitle{System Achitecture}
+  \begin{center}
+  \includegraphics[height=18em]{system.png}
+  \end{center}
 \end{frame}
 
-\section{Parallel Training CRFs in MADlib}
+
+\section{Feature Extraction}
+\begin{frame}
+  \frametitle{Text Feature Extraction}
+   \ Text feature extraction is a step in most statistical text analysis methods, and it can be an expensive operation. 
+     To achieve high quality, CRF methods often assign tens of features to each token in the document. \\[1.5mm] 
+     \textbf{\ Features}\vspace{-1.5mm}
+     \begin{itemize}
+      \item dictionary features: does this token exist in a provided dictionary? 
+      \item regex features: does this token match a provided regular expression? 
+      \item edge features: is the label of a token correlated with the label of a previous token? 
+      \item word features: does this the token appear in the training data? 
+      \item position features: is this token the first or last in the token sequence? 
+     \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Training Feature Extraction}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Testing Feature Extraction}
+  \begin{itemize}
+  \item Use $M$ table to encode edge features, position features. \\
+  $M$ schema: $mtbl(prev\_label,label,value)$.
+  \item Use $R$ table to encode single state features such as dictionary features, regex features.\\ 
+  $R$ schema: $rtbl(seg\_text,label,value)$. \\
+  \end{itemize}
+  \includegraphics[height=7.02em]{m.png}\\
+  \includegraphics[height=5.85em]{r.png}\\
+\end{frame}
+
+\section{Linear-chain CRF training}
 
 \begin{frame}
   \frametitle{Parallel Training CRFs in MADlib}
@@ -114,15 +127,61 @@ $lbfgs(\lambda,\ell_\lambda,\nabla \ell_\lambda,Hessian,other args)$\\
 }\\
 \end{frame}
 
+\begin{frame}
+  \frametitle{Forward-backward algorithm}
+  \begin{center}
+  \includegraphics[height=18em]{system.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The limited-memory BFGS}
+  \begin{center}
+  \includegraphics[height=18em]{system.png}
+  \end{center}
+\end{frame}
+
+\section{Viterbi Inference}
+\begin{frame}
+  \frametitle{Viterbi Inference}
+  The Viterbi algorithm is the popular algorithm to find the top-k most likely labelings of a document 
+for CRF models. 
+We chose to implement a Python UDF that uses iterations to drive the Viterbi inference. Each iteration will 
+finish the inference over one document.
+In Greenplum, Viterbi can be run in parallel over different subsets 
+of the document on a multi-core machine.
+\[
+V(i,y) =
+\begin{cases}
+ \max_{y^\prime}(V(i-1,y^\prime)) + \textstyle \sum_{k=1}^K \lambda_kf_k(y,y^\prime,x_i), & \text{if } i\ge0 \\
+ 0, & \text{if } i=-1.
+\end{cases}
+\]
+\begin{center}		             
+  %\begin{multicols}{2}
+      \includegraphics[height=5em,width=11em]{viterbip.jpg}
+      \includegraphics[height=5em,width=11em]{result.png}\\
+  %\end{multicols}
+\end{center}
+\end{frame}
+
 \section{Conclusion and Future Work}
 
 \begin{frame}
   \frametitle{Conclusion and Future Work}
 
   \begin{itemize}
-    \item SELECT madlib.traindata\_textfex(ags)
-    \item SELECT madlib.linear\_crf\_training(ags)
+    \item SELECT madlib.traindata\_textfex(args)
+    \item SELECT madlib.testdata\_textfex(args)
+    \item SELECT madlib.linear\_crf\_training(args)
+    \item SELECT madlib.viterbi\_inference(args)
   \end{itemize}
+  \begin{center}System: \textcolor{green}{Postgres} VS \textcolor{blue}{Greenplum(2 segments)}\\
+	  Text Feature Extraction + Viterbi Inference\end{center}
+  \begin{center}
+	  \includegraphics[height=9.9em]{extraction.png}
+	  \includegraphics[height=9.9em]{viterbi.png}
+  \end{center}
 \end{frame}
 
 \end{document}
