@@ -107,19 +107,19 @@
   \frametitle{Training Feature Extraction}
   \begin{itemize}
   %\item insert into temp\_feature(start\_pos, doc\_id, fname,pre\_label,label)\\ 
-  \item insert into temp\_feature\\ 
+  \item insert into temp\_feature(start\_pos, doc\_id, f\_name, -1, label)\\ 
         select start\_pos, doc\_id, 'R\_' $\mid\mid$ name, -1, label\\
         from   textfex\_regex, textfex\_segmenttbl\\
         where  seg\_text $\thicksim$ pattern\\
   \item create sequence f\_seq start 1 increment 1;\\
-        insert into feature\_index(f\_index,f\_name,pre\_label,label)\\ 
-        select nextval('f\_seq') distinct on f\_name, prev\_label, label\\
+        insert into feature\_index(f\_index,f\_type,pre\_label,label)\\ 
+        select nextval('f\_seq') distinct on f\_type, prev\_label, label\\
         from   temp\_feature\\
-  \item insert into feature\\
-        select start\_pos, doc\_id, temp\_feature.f\_name, temp\_feature.prev\_label, temp\_feature.label, f\_index\\
+  \item insert into feature(start\_pos, doc\_id, f\_name, f\_index)\\
+        select start\_pos, doc\_id, temp\_feature.f\_name, f\_index\\
         from   temp\_feature, feature\_index\\
         where ...\\
-  \item array aggregation to feature
+  \item array aggregation in the ascending order of start\_pos, ascending order of f\_index.
   \end{itemize}
 \end{frame}
 
