@@ -6,7 +6,7 @@
 % The title of the presentation:
 %  - first a short version which is visible at the bottom of each slide;
 %  - second the full title shown on the title slide;
-\title[RU style for Beamer]{
+\title[Linear-chain CRF for NLP in MADlib]{
   Linear-chain CRF for NLP in MADlib}
 
 % The author(s) of the presentation:
@@ -28,7 +28,7 @@
 % Add a date and possibly the name of the event to the slides
 %  - again first a short version to be shown at the bottom of each slide
 %  - second the full date and event name for the title slide
-\date[slides Example 2010]{\today}
+\date[Data Science Tea]{\today}
 
 \begin{document}
 
@@ -61,7 +61,21 @@
 \begin{frame}
   \frametitle{Introduction}
   \begin{center}
-  \includegraphics[height=10em, width=20em]{crf.jpg}
+  \includegraphics[height=10em, width=20em]{crf.jpg}\\
+  \begin{tabular}{|l|c|c|}
+  \multicolumn{3}{c}{\textbf{Table of strengths of DB and ML approaches}} \\
+  \hline
+  \textcolor{white}{X} & error & oov error \\
+  \hline
+  HMM & $5.69\%$ & $45.99\%$ \\
+  \hline
+  MEMM & $6.37\%$ & $54.61\%$ \\
+  \hline
+  CRF & $5.55\%$ & $48.05\%$ \\
+  \hline
+  \hline
+  \end{tabular}
+  \label{tab:approaches}
   \end{center}
 \end{frame}
 
@@ -107,7 +121,16 @@
   \includegraphics[height=5.85em]{r.png}\\
 \end{frame}
 
-\section{Linear-chain CRF training}
+\section{CRF training and Viterbi Inference}
+\begin{frame}
+  \frametitle{Training Feature Extraction}
+  Problem definition: determine the parameters $\theta=(\lambda_1,\lambda_2,...;\mu_1,\mu_2,...)$\\
+  Objective:maximize the log-likelihood objective function.\\
+  $F(y,x)=\sum_i{f(y,x,i)}$\\
+  $p(Y|X)=exp\lambda.F(Y,X)/Z_\lambda(X)$\\
+  where\\
+  $Z_\lambda=\sum_y{exp\lambda.F(y,x)}$
+\end{frame}
 
 \begin{frame}
   \frametitle{Parallel Training CRFs in MADlib}
@@ -128,6 +151,29 @@ $lbfgs(\lambda,\ell_\lambda,\nabla \ell_\lambda,Hessian,other args)$\\
 \end{frame}
 
 \begin{frame}
+  \frametitle{User Defined Aggregates}
+  \begin{itemize}
+\item MADLIB\_SCHEMA.crf\_gradient\_step\_transition(
+		DOUBLE PRECISION[],
+		BOOLEAN,
+		DOUBLE PRECISION[],
+		DOUBLE PRECISION[])
+	RETURNS DOUBLE PRECISION[]
+
+
+\item MADLIB\_SCHEMA.crf\_gradient\_step\_merge\_states(
+		state1 DOUBLE PRECISION[],
+		state2 DOUBLE PRECISION[])
+	RETURNS DOUBLE PRECISION[]
+
+
+\item MADLIB\_SCHEMA.crf\_gradient\_step\_final(
+		state DOUBLE PRECISION[])
+	RETURNS DOUBLE PRECISION[]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{Forward-backward algorithm}
   \begin{center}
   \includegraphics[height=18em]{system.png}
@@ -141,7 +187,7 @@ $lbfgs(\lambda,\ell_\lambda,\nabla \ell_\lambda,Hessian,other args)$\\
   \end{center}
 \end{frame}
 
-\section{Viterbi Inference}
+%\section{Viterbi Inference}
 \begin{frame}
   \frametitle{Viterbi Inference}
   The Viterbi algorithm is the popular algorithm to find the top-k most likely labelings of a document 
@@ -181,6 +227,13 @@ V(i,y) =
   \begin{center}
 	  \includegraphics[height=9.9em]{extraction.png}
 	  \includegraphics[height=9.9em]{viterbi.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Questions}
+  \begin{center}
+   Thanks! Questions?
   \end{center}
 \end{frame}
 
