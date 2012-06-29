@@ -50,12 +50,10 @@
 
 \begin{frame}
   \frametitle{Introduction}
+  \includegraphics[height=11em]{models.jpg}\\
   \begin{itemize}
-    \item Conditional probability p(label sequence y|observation sequence x) rather than p(y,x)
+    \item Conditional probability p(label sequence y\|observation sequence x) rather than p(y,x)
     \item Allow arbitrary, non-independent features of the observation sequence X. 
-    \item A CRF on (X,Y) is specified by a vector $f$ of local features and a corresponding weight vector
-          lambda.
-    \item Each local feature is either a $state feature s(y,x,i)$ or a transition feature t(y,y) 
   \end{itemize}
 \end{frame}
 \begin{frame}
@@ -106,17 +104,22 @@
 
 \begin{frame}
   \frametitle{Training Feature Extraction}
-  INSERT INTO temp_feature(start_pos, doc_id, fname,pre_label_id,label_id)\\ 
-                        SELECT start_pos, doc_id, 'R_' || name, -1, label\\
-                        FROM   textfex_regex, textfex_segmenttbl\\
-                        WHERE  seg_text ~ pattern;\\
-  INSERT INTO temp_feature_index(fname,pre_label_id,label_id)\\ 
-                        SELECT DISTINCT ON fname, prev_label_id, label_id\\
-                        FROM   temp_feature;\\
-  INSERT INTO featuretbl(start_pos, doc_id, fname,pre_label_id,label_id,findex)\\
-                        SELECT start_pos, doc_id, temp_feature.fname, temp_feature.prev_label_id, temp_feature.label_id, findex\\
-                        FROM   temp_feature, temp_feature_index\\
- 
+  \begin{itemize}
+  \item $INSERT INTO temp\_feature(start\_pos, doc\_id, fname,pre\_label,label)$\\ 
+                        $SELECT start\_pos, doc\_id, 'R\_' || name, -1, label$\\
+                        $FROM   textfex\_regex, textfex\_segmenttbl$\\
+                        $WHERE  seg\_text ~ pattern$\\
+
+
+  \item $INSERT INTO temp\_feature_index(fname,pre\_label,label)$\\ 
+                        $SELECT DISTINCT ON fname, prev\_label\_id, label\_id$\\
+                        $FROM   temp\_feature$\\
+
+
+  \item $INSERT INTO feature(start\_pos, doc\_id, fname,pre\_label,label,f_index)$\\
+                        $SELECT start\_pos, doc\_id, temp\_feature.fname, temp\_feature.prev\_label, temp\_feature.label, f\_index$\\
+                        $FROM   temp\_feature, temp\_feature\_index$\\
+  \end{itemize}
 \end{frame}
 
 
@@ -250,12 +253,10 @@ V(i,y) =
     \item SELECT madlib.linear\_crf\_training(args)
     \item SELECT madlib.viterbi\_inference(args)
   \end{itemize}
-  \begin{center}System: \textcolor{green}{Postgres} VS \textcolor{blue}{Greenplum(2 segments)}\\
-	  Text Feature Extraction + Viterbi Inference\end{center}
-  \begin{center}
+  System: \textcolor{green}{Postgres} VS \textcolor{blue}{Greenplum(2 segments)}\\
+	  Text Feature Extraction + Viterbi Inference
 	  \includegraphics[height=9.9em]{extraction.png}
 	  \includegraphics[height=9.9em]{viterbi.png}
-  \end{center}
 \end{frame}
 
 \begin{frame}
