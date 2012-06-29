@@ -50,18 +50,10 @@
 
 \begin{frame}
   \frametitle{Introduction}
-  \includegraphics[height=11em]{models.jpg}\\
-  \begin{itemize}
-    \item Conditional probability p(label sequence y\|observation sequence x) rather than p(y,x)
-    \item Allow arbitrary, non-independent features of the observation sequence X. 
-  \end{itemize}
-\end{frame}
-\begin{frame}
-  \frametitle{Introduction}
   \begin{center}
   \includegraphics[height=10em, width=20em]{crf.jpg}\\
   \begin{tabular}{|l|c|c|}
-  \multicolumn{3}{c}{\textbf{Table of strengths of DB and ML approaches}} \\
+  \multicolumn{3}{c}{\textbf{POS accuracy over different graphic models}} \\
   \hline
   \textcolor{white}{X} & error & oov error \\
   \hline
@@ -75,6 +67,17 @@
   \end{tabular}
   \label{tab:approaches}
   \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Introduction}
+  \begin{center}
+  \includegraphics[height=10em]{models.jpg}\\
+  \end{center}
+  \begin{itemize}
+    \item Conditional probability $p(y \mid x)$ rather than $p(y,x)$. Don't need to model distribution over variables, we don't care.
+    \item Allow models with highly expressive features without worrying about wrong independencies.
+  \end{itemize}
 \end{frame}
 
 \section{System Achitecture}
@@ -91,8 +94,6 @@
 \begin{frame}
   \frametitle{Text Feature Extraction}
    \ Text feature extraction is a step in most statistical text analysis methods, and it can be an expensive operation. 
-     To achieve high quality, CRF methods often assign tens of features to each token in the document. \\[1.5mm] 
-     \textbf{\ Features}\vspace{-1.5mm}
      \begin{itemize}
       \item dictionary features: does this token exist in a provided dictionary? 
       \item regex features: does this token match a provided regular expression? 
@@ -105,20 +106,20 @@
 \begin{frame}
   \frametitle{Training Feature Extraction}
   \begin{itemize}
-  \item $INSERT INTO temp\_feature(start\_pos, doc\_id, fname,pre\_label,label)$\\ 
-                        $SELECT start\_pos, doc\_id, 'R\_' || name, -1, label$\\
-                        $FROM   textfex\_regex, textfex\_segmenttbl$\\
-                        $WHERE  seg\_text ~ pattern$\\
-
-
-  \item $INSERT INTO temp\_feature_index(fname,pre\_label,label)$\\ 
-                        $SELECT DISTINCT ON fname, prev\_label\_id, label\_id$\\
-                        $FROM   temp\_feature$\\
-
-
-  \item $INSERT INTO feature(start\_pos, doc\_id, fname,pre\_label,label,f_index)$\\
-                        $SELECT start\_pos, doc\_id, temp\_feature.fname, temp\_feature.prev\_label, temp\_feature.label, f\_index$\\
-                        $FROM   temp\_feature, temp\_feature\_index$\\
+  %\item insert into temp\_feature(start\_pos, doc\_id, fname,pre\_label,label)\\ 
+  \item insert into temp\_feature\\ 
+        select start\_pos, doc\_id, 'R\_' $\mid\mid$ name, -1, label\\
+        from   textfex\_regex, textfex\_segmenttbl\\
+        where  seg\_text $\thicksim$ pattern\\
+  \item create sequence f\_seq start 1 increment 1;\\
+        insert into feature\_index(f\_index,f\_name,pre\_label,label)\\ 
+        select nextval('f\_seq') distinct on f\_name, prev\_label, label\\
+        from   temp\_feature\\
+  \item insert into feature\\
+        select start\_pos, doc\_id, temp\_feature.f\_name, temp\_feature.prev\_label, temp\_feature.label, f\_index\\
+        from   temp\_feature, feature\_index\\
+        where ...\\
+  \item array aggregation to feature
   \end{itemize}
 \end{frame}
 
@@ -126,13 +127,13 @@
 \begin{frame}
   \frametitle{Testing Feature Extraction}
   \begin{itemize}
-  \item Use $M$ table to encode edge features, position features. \\
+  \item Use $M$ table to encode transision features \\
   $M$ schema: $mtbl(prev\_label,label,value)$.
-  \item Use $R$ table to encode single state features such as dictionary features, regex features.\\ 
-  $R$ schema: $rtbl(seg\_text,label,value)$. \\
-  \end{itemize}
   \includegraphics[height=7.02em]{m.png}\\
+  \item Use $R$ table to encode single state features.\\ 
+  $R$ schema: $rtbl(seg\_text,label,value)$. \\
   \includegraphics[height=5.85em]{r.png}\\
+  \end{itemize}
 \end{frame}
 
 \section{CRF training and Viterbi Inference}
@@ -152,27 +153,43 @@
 
 \begin{frame}
   \frametitle{Maximum Log\-likehood Principle}
-  Train a CRF by maximizing the log-likelihood of a give training set $T={(x_k,y_k)}_{k=1}^N$\\
-  $\max \ell_{\lambda}=\sum_k{(\lambda (F(y_k,x_k)-\log Z_\lambda(x_k))}$\\
-  To perform this optimization, we seek the zero of the gradient\\
-  $\nabla \ell_{\lambda}=\sum_k{(\lambda F(y_k,x_k)-E_{p\lambda(Y|x_k)}F(Y,x_k))}$\\
+  \begin{itemize}
+
+ \item  Train a CRF by maximizing the log-likelihood of a give training set $T={(x_k,y_k)}_{k=1}^N$\\
+ \item $\max \ell_{\lambda}=\sum_k{\log p_\lambda(y_k\mid x_k)}=\sum_k{(\lambda (F(y_k,x_k)-\log Z_\lambda(x_k))}$\\
+ \item To perform this optimization, we seek the zero of the gradient\\
+  $\nabla \ell_{\lambda}=\sum_k{(F(y_k,x_k)-E_{p_\lambda(Y|x_k)}F(Y,x_k))}$\\
+ \item To avoid overfitting, penalize with prior\\
+      $\max \ell_{\lambda}=\sum_k{(\lambda (F(y_k,x_k)-\log Z_\lambda(x_k))}-
+\frac{\lVert \lambda \rVert_2}{2\sigma_2}
+      +const$\\
+  $\nabla \ell_{\lambda}=\sum_k{(F(y_k,x_k)-E_{p_\lambda(Y|x_k)}F(Y,x_k))}-\frac{\lVert \lambda \rVert}{\sigma_2}$\\
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Parallel Training CRFs in MADlib}
-  \fbox{%
-        \parbox{0.95\linewidth}{%
-1.Evaluate the log-likelihood function and gradient vector\\
+\begin{itemize}
+\item Evaluate the log-likelihood function and gradient vector\\
 $\ell_{\lambda_k}=\lambda F(y_k,x_k)-\log Z_\lambda(x_k)$(log-likelihood for doc. $k$)\\
 $\nabla \ell_{\lambda_k}=\lambda F(y_k,x_k)-E_{p\lambda(Y|x_k)}F(Y,x_k)$(gradient vector for doc. $k$)\\
-2.Sum up over all documents \\
+\item Sum up over all documents \\
 $\ell_\lambda=\sum_k\ell_{\lambda_k}-\frac{\lambda^2}{2\sigma ^2}+const$(log-likelihood for all docs.)\\
 $\nabla \ell_\lambda=\sum_k\nabla \ell_{\lambda_k}-\frac{\lambda}{\sigma ^2}$(gradient vector for all docs.)\\
-3.Perform LBFGS optimization, a variation of quasi-Newton algorithm\\
+\item Perform LBFGS optimization, a variation of quasi-Newton algorithm\\
 $lbfgs(\lambda,\ell_\lambda,\nabla \ell_\lambda,Hessian,other args)$\\
-4.Repeat step 1 and step2 until stop condition is satisfied
-        }%
-}\\
+\item Repeat step 1 and step2 until stop condition is satisfied
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Sequence Diagram for CRF training}
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.66]{LogisticRegression}
+	\caption{Sequence Diagram for CRF}
+	\label{fig:log-reg-driver}
+\end{figure}
 \end{frame}
 
 \begin{frame}
@@ -190,54 +207,67 @@ $lbfgs(\lambda,\ell_\lambda,\nabla \ell_\lambda,Hessian,other args)$\\
 
 \begin{frame}
   \frametitle{Forward-backward algorithm}
-  The expectation $E_{p\lambda(Y|x_k)}F(Y,x)$ can be computed efficiently using a variant of the forward-backward algorithm.
-For a given x, define the transition matrix for position i as \\
-$M_i[y,y^\prime]=\exp \lambda f(y,y^\prime,x,i)$\\
-$Let f be any local feature, f_i[y,y^\prime]=f(y,y^\prime,x,i),$
-$F(y,x)=\sum_i{f(y_{i-1},y_i,x,i)}, and let * denote component-wise matrix product, then$\\
-$E_{p\lambda(Y|x_k)}F(Y,x)=\sum_y{p_\lambda(y|x)F(y,x)}$\\
-$=\sum_i{\frac{a_{i-1}(f_i*M_i)\beta_i^T}{Z_\lambda(x)}}$\\
+  $E_{p\lambda(Y|x_k)}F(Y,x)$ can be computed efficiently using the forward-backward algorithm.
+For a given x, define the transition matrix for position i as
+$M_i[y,y']=\exp \lambda f(y,y',x,i)$\\
+$E_{p\lambda(Y|x)}F(Y,x)=\sum_y{p_\lambda(y|x)F(y,x)}$
+$=\sum_i{\frac{\alpha_{i-1}(f_i*M_i)\beta_i^T}{Z_\lambda(x)}}$\\
 \begin{itemize}
-\item $Z_\lambda(x)=a_n \cdot 1^T$
-\item $a_i=$
-\item $\beta_i^T=$
+\item $Z_\lambda(x)=\alpha_n \cdot 1^T$
+\item $\alpha_i = 
+       \begin{cases} \alpha_{i-1}M_i, &\text{if } i\ge0\\
+                     1, & \text{if } i=0
+       \end{cases}$
+\item $
+       \beta_i^T = 
+       \begin{cases} M_{i+1}\beta_{i+1}^T, &\text{if } i\ge0\\
+                     1, & \text{if } i=n
+       \end{cases}
+      $
 \end{itemize}
-Use a forward pass to compute the $a_i$ and a backward pass to compute $\beta_i$ and accumulate the feature expectations.
+Use a forward pass to compute the $\alpha_i$ and a backward pass to compute $\beta_i$ and accumulate the feature expectations.
 \end{frame}
 
 \begin{frame}
   \frametitle{The limited-memory BFGS}
-  $f_T(x_n+\nabla x)=f_T(x)=f(x_n)+f^\prime(x_n)\nbla x +1/2f\prime\prime(x_n)\nblax^2$\\
-  $f^\prime(x_n)+f^\prime\prime(x_n)\nblax x=0;$
-  $x_{n+1} = x_n - \frac{f^\prime(x_n)}{f^\prime\prime(x_n)},n=0,1,..$\\
-  will converge towards a root of $f_prime(x)=0$
+  \begin{itemize}
+
+  \item Newton Algorithm\\ 
+  $f_T(x_n+\Delta x)=f_T(x)=f(x_n)+f'(x_n)\Delta x +1/2f''(x_n)\Delta^2$\\
+  $f''(x_n)+f''(x_n)\Delta x=0;$
+  $x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)},n=0,1,..$\\
+  will converge towards a root of $f'(x^*)=0$
   \begin{center}
-  \includegraphics[height=8em]{newton_grad.png}
+  \includegraphics[height=5em]{newton_grad.png}
   \end{center}
- LBFGS\\
+  \item LBFGS\\
+ Limited-memory BFGS (L-BFGS) is a second-order
+method that estimates the curvature numerically from
+previous gradients and updates, avoiding the need for
+an exact Hessian inverse computation.
+  \end{itemize}
  
 \end{frame}
 
 %\section{Viterbi Inference}
 \begin{frame}
   \frametitle{Viterbi Inference}
-  The Viterbi algorithm is the popular algorithm to find the top-k most likely labelings of a document 
+  The Viterbi algorithm is to find the top-k most likely labelings of a document 
 for CRF models. 
-We chose to implement a Python UDF that uses iterations to drive the Viterbi inference. Each iteration will 
-finish the inference over one document.
+We chose to implement a Python UDF that uses iterations to drive the Viterbi inference. 
 In Greenplum, Viterbi can be run in parallel over different subsets 
 of the document on a multi-core machine.
 \[
 V(i,y) =
 \begin{cases}
- \max_{y^\prime}(V(i-1,y^\prime)) + \textstyle \sum_{k=1}^K \lambda_kf_k(y,y^\prime,x_i), & \text{if } i\ge0 \\
+ \max_{y'}(V(i-1,y')) + \textstyle \sum_{k=1}^K \lambda_kf_k(y,y',x_i), & \text{if } i\ge0 \\
  0, & \text{if } i=-1.
 \end{cases}
 \]
 \begin{center}		             
   %\begin{multicols}{2}
-      \includegraphics[height=5em,width=11em]{viterbip.jpg}
-      \includegraphics[height=5em,width=11em]{result.png}\\
+      \includegraphics[height=7em,width=14em]{viterbip.jpg}
+      \includegraphics[height=7em,width=14em]{result.png}\\
   %\end{multicols}
 \end{center}
 \end{frame}
@@ -248,9 +278,9 @@ V(i,y) =
   \frametitle{Conclusion and Future Work}
 
   \begin{itemize}
-    \item SELECT madlib.traindata\_textfex(args)
+    \item SELECT madlib.traindata\_textfex(args)(\textcolor{red}{ongoing})
     \item SELECT madlib.testdata\_textfex(args)
-    \item SELECT madlib.linear\_crf\_training(args)
+    \item SELECT madlib.linear\_crf\_training(args)(\textcolor{red}{ongoing})
     \item SELECT madlib.viterbi\_inference(args)
   \end{itemize}
   System: \textcolor{green}{Postgres} VS \textcolor{blue}{Greenplum(2 segments)}\\
