@@ -106,6 +106,17 @@
 
 \begin{frame}
   \frametitle{Training Feature Extraction}
+  INSERT INTO temp_feature(start_pos, doc_id, fname,pre_label_id,label_id)\\ 
+                        SELECT start_pos, doc_id, 'R_' || name, -1, label\\
+                        FROM   textfex_regex, textfex_segmenttbl\\
+                        WHERE  seg_text ~ pattern;\\
+  INSERT INTO temp_feature_index(fname,pre_label_id,label_id)\\ 
+                        SELECT DISTINCT ON fname, prev_label_id, label_id\\
+                        FROM   temp_feature;\\
+  INSERT INTO featuretbl(start_pos, doc_id, fname,pre_label_id,label_id,findex)\\
+                        SELECT start_pos, doc_id, temp_feature.fname, temp_feature.prev_label_id, temp_feature.label_id, findex\\
+                        FROM   temp_feature, temp_feature_index\\
+ 
 \end{frame}
 
 
@@ -123,20 +134,31 @@
 
 \section{CRF training and Viterbi Inference}
 \begin{frame}
-  \frametitle{Training Feature Extraction}
-  Problem definition: determine the parameters $\theta=(\lambda_1,\lambda_2,...;\mu_1,\mu_2,...)$\\
-  Objective:maximize the log-likelihood objective function.\\
-  $F(y,x)=\sum_i{f(y,x,i)}$\\
-  $p(Y|X)=exp\lambda.F(Y,X)/Z_\lambda(X)$\\
-  where\\
-  $Z_\lambda=\sum_y{exp\lambda.F(y,x)}$
+  \frametitle{CRFs Objective Function}
+  %\textbf{\ Features}\vspace{-1.5mm}
+  $\max p_\theta (y|x) = \frac{\exp(\sum_j{\lambda_jt_j(y_{i-1},y_i,x,i) + \sum_k{\mu_k s_k(y_i,x,i))}}}
+                        {\sum_y {\exp(\sum_j{\lambda_jt_j(y_{i-1},y_i,x,i) + \sum_k{\mu_k s_k(y_i,x,i))}}}}$\\
+  \begin{itemize}
+  \item $\theta=(\lambda_1,\lambda_2,...;\mu_1,\mu_2,...)$
+  \item $t_j(y_{i-1},y_i,x,i)$ is a transition feature function of the entire observation sequence and the labels at positions $i$ and 
+       $i-1$ in the label sequence
+  \item $s_k(y_i,x,i)$ is a state feature function of the label at position $i$ and the observation sequence
+  \item $\lambda_i$ and $\mu_k$ are parameters to be estimated from training data.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Maximum Log\-likehood Principle}
+  Train a CRF by maximizing the log-likelihood of a give training set $T={(x_k,y_k)}_{k=1}^N$\\
+  $\max \ell_{\lambda}=\sum_k{(\lambda (F(y_k,x_k)-\log Z_\lambda(x_k))}$\\
+  To perform this optimization, we seek the zero of the gradient\\
+  $\nabla \ell_{\lambda}=\sum_k{(\lambda F(y_k,x_k)-E_{p\lambda(Y|x_k)}F(Y,x_k))}$\\
 \end{frame}
 
 \begin{frame}
   \frametitle{Parallel Training CRFs in MADlib}
   \fbox{%
         \parbox{0.95\linewidth}{%
-\textcolor{green}{\bf Parallel CRF training algorithm}\\
 1.Evaluate the log-likelihood function and gradient vector\\
 $\ell_{\lambda_k}=\lambda F(y_k,x_k)-\log Z_\lambda(x_k)$(log-likelihood for doc. $k$)\\
 $\nabla \ell_{\lambda_k}=\lambda F(y_k,x_k)-E_{p\lambda(Y|x_k)}F(Y,x_k)$(gradient vector for doc. $k$)\\
@@ -153,38 +175,44 @@ $lbfgs(\lambda,\ell_\lambda,\nabla \ell_\lambda,Hessian,other args)$\\
 \begin{frame}
   \frametitle{User Defined Aggregates}
   \begin{itemize}
-\item MADLIB\_SCHEMA.crf\_gradient\_step\_transition(
-		DOUBLE PRECISION[],
-		BOOLEAN,
-		DOUBLE PRECISION[],
-		DOUBLE PRECISION[])
-	RETURNS DOUBLE PRECISION[]
+\item madlib.crf\_gradient\_step\_transition(state,otherargs)RETURNS state
 
 
-\item MADLIB\_SCHEMA.crf\_gradient\_step\_merge\_states(
-		state1 DOUBLE PRECISION[],
-		state2 DOUBLE PRECISION[])
-	RETURNS DOUBLE PRECISION[]
+\item madlib.crf\_gradient\_step\_merge\_states(state ,state) RETURNS state
 
 
-\item MADLIB\_SCHEMA.crf\_gradient\_step\_final(
-		state DOUBLE PRECISION[])
-	RETURNS DOUBLE PRECISION[]
+\item madlib.crf\_gradient\_step\_final(state) RETURNS state
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Forward-backward algorithm}
-  \begin{center}
-  \includegraphics[height=18em]{system.png}
-  \end{center}
+  The expectation $E_{p\lambda(Y|x_k)}F(Y,x)$ can be computed efficiently using a variant of the forward-backward algorithm.
+For a given x, define the transition matrix for position i as \\
+$M_i[y,y^\prime]=\exp \lambda f(y,y^\prime,x,i)$\\
+$Let f be any local feature, f_i[y,y^\prime]=f(y,y^\prime,x,i),$
+$F(y,x)=\sum_i{f(y_{i-1},y_i,x,i)}, and let * denote component-wise matrix product, then$\\
+$E_{p\lambda(Y|x_k)}F(Y,x)=\sum_y{p_\lambda(y|x)F(y,x)}$\\
+$=\sum_i{\frac{a_{i-1}(f_i*M_i)\beta_i^T}{Z_\lambda(x)}}$\\
+\begin{itemize}
+\item $Z_\lambda(x)=a_n \cdot 1^T$
+\item $a_i=$
+\item $\beta_i^T=$
+\end{itemize}
+Use a forward pass to compute the $a_i$ and a backward pass to compute $\beta_i$ and accumulate the feature expectations.
 \end{frame}
 
 \begin{frame}
   \frametitle{The limited-memory BFGS}
+  $f_T(x_n+\nabla x)=f_T(x)=f(x_n)+f^\prime(x_n)\nbla x +1/2f\prime\prime(x_n)\nblax^2$\\
+  $f^\prime(x_n)+f^\prime\prime(x_n)\nblax x=0;$
+  $x_{n+1} = x_n - \frac{f^\prime(x_n)}{f^\prime\prime(x_n)},n=0,1,..$\\
+  will converge towards a root of $f_prime(x)=0$
   \begin{center}
-  \includegraphics[height=18em]{system.png}
+  \includegraphics[height=8em]{newton_grad.png}
   \end{center}
+ LBFGS\\
+ 
 \end{frame}
 
 %\section{Viterbi Inference}
