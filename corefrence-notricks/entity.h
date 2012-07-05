@@ -90,7 +90,7 @@ public:
     void insert(int mentionId) {
         bool found=false;
         mentionSet.insert(mentionId);
-        for(int i=0; i<group_size; i++) {
+        /*for(int i=0; i<group_size; i++) {
             if(token_freq[i].count==0) {
                 token_freq[i].count=1;
                 memset(token_freq[i].token,'\0',maxtokenlen);
@@ -106,7 +106,7 @@ public:
                 break;
             }
         }
-        if(!found) othersmentionSet.insert(mentionId);
+        if(!found) othersmentionSet.insert(mentionId);*/
     }
     int pre_add_score() {
         return prefixf.pre_add_score()+docf.pre_add_score()+posf.pre_add_score();
@@ -116,9 +116,9 @@ public:
     }
     entity() {
         id=0;
-        for(int i=0; i<group_size; i++) {
+        /*for(int i=0; i<group_size; i++) {
             memset(token_freq[i].token,'\0',maxtokenlen);
             token_freq[i].count=0;
-        }
+        }*/
     }
 };

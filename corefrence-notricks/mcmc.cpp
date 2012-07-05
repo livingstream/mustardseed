@@ -96,12 +96,12 @@ int main ()
                 transform(word.begin(),word.end(),word.begin(),::tolower);
                 str_len=min(maxtokenlen-1,(int)strlen(word.c_str()));
                 memcpy(tmpS,word.c_str(),str_len);
-                if(literalMap.count(word)==0) {
+                //if(literalMap.count(word)==0) {
                     dest_entity=literalMap.size();
                     literalMap.insert(pair<string,int>(word,dest_entity));
-                } else {
+                //} else {
                     dest_entity=literalMap.find(word)->second;
-                }
+                //}
             }
             i++;
         }
