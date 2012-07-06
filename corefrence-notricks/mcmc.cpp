@@ -100,7 +100,7 @@ int main ()
                     dest_entity=literalMap.size();
                     literalMap.insert(pair<string,int>(word,dest_entity));
                 //} else {
-                    dest_entity=literalMap.find(word)->second;
+                    //dest_entity=literalMap.find(word)->second;
                 //}
             }
             i++;
@@ -132,35 +132,15 @@ int main ()
         int loss=0;
         int gain=0;
         //calculate loss
-        unordered_set<size_t> source_othersmentionSet = entityArray[source_entity].othersmentionSet;
-        for(auto it=source_othersmentionSet.begin(); it!=source_othersmentionSet.end(); ++it)
+        unordered_set<size_t> source_mentionSet = entityArray[source_entity].mentionSet;
+        for(auto it=source_mentionSet.begin(); it!=source_mentionSet.end(); ++it)
             if(source_mention!=*it)
                 loss+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
-        for(int i=0; i<group_size; i++) {
-            int count=entityArray[source_entity].token_freq[i].count;
-            if(count>0) {
-                auto it =entityArray[source_entity].group_set[i].begin();
-                int single_score=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
-                if(entityArray[source_entity].group_set[i].count(source_mention)==0)
-                    loss+=single_score*count;
-                else loss+=single_score*(count-1);
-            }
-        }
         //end calculate loss
         //calcuate gain
-        unordered_set<size_t> dest_othersmentionSet = entityArray[dest_entity].othersmentionSet;
-        for(auto it=dest_othersmentionSet.begin(); it!=dest_othersmentionSet.end(); ++it)
+        unordered_set<size_t> dest_mentionSet = entityArray[dest_entity].mentionSet;
+        for(auto it=dest_mentionSet.begin(); it!=dest_mentionSet.end(); ++it)
             gain+=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
-        for(int i=0; i<group_size; i++) {
-            int count=entityArray[dest_entity].token_freq[i].count;
-            if(count>0) {
-                auto it =entityArray[dest_entity].group_set[i].begin();
-                int single_score=mentionArray[source_mention].pairwiseScore(mentionArray[*it]);
-                if(entityArray[dest_entity].group_set[i].count(source_mention)==0)
-                    gain+=single_score*count;
-                else gain+=single_score*(count-1);
-            }
-        }
         //end calculate gain
         //accept or not
         if(gain>loss) { // we should accept it
@@ -187,13 +167,6 @@ int main ()
                 cerr << "------------------------------------\n";
             }
             entityArray[mentionArray[source_mention].entityId].mentionSet.erase(source_mention);
-            entityArray[mentionArray[source_mention].entityId].othersmentionSet.erase(source_mention);
-            for(int i=0; i<group_size; i++) {
-                if(entityArray[source_entity].group_set[i].count(source_mention)>0) {
-                    entityArray[source_entity].token_freq[i].count--;
-                    entityArray[source_entity].group_set[i].erase(source_mention);
-                }
-            }
             entityArray[dest_entity].insert(source_mention);
             mentionArray[source_mention].entityId=dest_entity;
             currentEntropy=currentEntropy+gain-loss;

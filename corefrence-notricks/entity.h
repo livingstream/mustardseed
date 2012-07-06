@@ -81,32 +81,11 @@ class entity {
 public:
     size_t id; // An unique identifier for the entity (in consequential)
     unordered_set<size_t> mentionSet; // all the mentions belong to the entity
-    unordered_set<size_t> othersmentionSet; // all the mentions belong to the entity
-    token_count token_freq[group_size];
-    unordered_set<size_t> group_set[group_size];
     c_sameprefix_f prefixf;
     c_samedoc_f docf;
     c_samepos_f posf;
     void insert(int mentionId) {
-        bool found=false;
         mentionSet.insert(mentionId);
-        /*for(int i=0; i<group_size; i++) {
-            if(token_freq[i].count==0) {
-                token_freq[i].count=1;
-                memset(token_freq[i].token,'\0',maxtokenlen);
-                memcpy(token_freq[i].token,mentionArray[mentionId].stringL,mentionArray[mentionId].len);
-                assert(group_set[i].size()==0);
-                group_set[i].insert(mentionId);
-                found=true;
-                break;
-            } else if (memcmp(mentionArray[mentionId].stringL,token_freq[i].token,maxtokenlen)==0) {
-                token_freq[i].count++;
-                group_set[i].insert(mentionId);
-                found=true;
-                break;
-            }
-        }
-        if(!found) othersmentionSet.insert(mentionId);*/
     }
     int pre_add_score() {
         return prefixf.pre_add_score()+docf.pre_add_score()+posf.pre_add_score();
@@ -116,9 +95,5 @@ public:
     }
     entity() {
         id=0;
-        /*for(int i=0; i<group_size; i++) {
-            memset(token_freq[i].token,'\0',maxtokenlen);
-            token_freq[i].count=0;
-        }*/
     }
 };
