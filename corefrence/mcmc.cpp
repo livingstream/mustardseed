@@ -15,9 +15,9 @@
 #include "entity.h"
 using namespace std;
 #define bias 0 // affinity score and replusion score bais
-//#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
-#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
-#define DEBUG true
+#define nytdatapath "/home/cgrant/data/NYT/dbdump/nytmentionsfull_collapsed.csv"
+//#define nytdatapath "/home/kun/Desktop/nytmentionspy.csv"
+#define DEBUG false
 
 entity entityArray[Nmen];
 
@@ -115,7 +115,9 @@ int main ()
     size_t accepted=0;
     srand((unsigned)time(0));
     time_t beginTime, endTime;
+		int tic, toc;
     beginTime = time (NULL);
+		tic = clock(); // Fast timing
     while(iter<Niter) {
         iter=iter+1;
         size_t source_mention;
@@ -199,10 +201,18 @@ int main ()
             currentEntropy=currentEntropy+gain-loss;
         }
     }
+		toc = clock();
     endTime=time (NULL);
+		for(int i =0; i != Nmen; ++i) {
+			printMention(mentionArray[i]);
+		}
     cout<<"number of accepted proposals="<<"	"<<accepted<<endl;
     cout<<"number of rejected proposals="<<"	"<<Niter-accepted<<endl;
-    cout << "iter: " << iter << ", endtime: " << endTime << ", beginTime: " << beginTime << endl;
-    cout<<"speed="<<iter/(endTime-beginTime)<<endl;
+    cout << "iter: " << iter << ", endtime: " << toc*1.0/CLOCKS_PER_SEC << ", beginTime: " << tic*1.0/CLOCKS_PER_SEC << endl;
+    //cout << "iter: " << iter << ", endtime: " << endTime << ", beginTime: " << beginTime << endl;
+    //cout<<"speed="<<iter/(endTime-beginTime)<<endl;
+		cout <<"time= " << (toc-tic*1.0)/CLOCKS_PER_SEC << endl;
+		cout <<"speed= " << iter/((toc-tic*1.0)/CLOCKS_PER_SEC) << endl;
+		cout << Nmen << " " << Niter << " " << (toc-tic*1.0)/CLOCKS_PER_SEC << " " << iter/((toc-tic*1.0)/CLOCKS_PER_SEC) << endl;
     return 0;
 }
