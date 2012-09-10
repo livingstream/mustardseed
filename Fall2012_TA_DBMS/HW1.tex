@@ -1,0 +1,183 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{enumerate}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\begin{document}
+
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+
+\title{Database Management Systems(COP 5725) \\ HW1}%replace X with the appropriate number
+\author{Instructor: Dr. Daisy Zhe Wang\\\\
+TA:\\ 
+Kun Li, Yang Chen\\ 
+${kli,yang}@cise.ufl.edu$\\
+} %if necessary, replace with your course title
+
+\date{\today}
+\maketitle
+
+
+\begin {table}[h]
+\[\begin{tabular}{|l|p{10cm}|} \hline
+  Name: & \\ \hline
+  UFID: & \\ \hline
+  Email Adress: & \\ 
+  \hline  
+\end{tabular}\]
+\end{table}
+
+\linespread{2}
+\noindent
+Pledge(Must be signed according to UF Honor Code)\\
+On my honor, I have neither given nor received unauthorized aid in doing this
+assignment.\\
+
+Signature \underline{\hspace{5cm}}
+
+\null
+\vfill
+\begin{center}
+\large \emph{Department of Computer and Information Science and Engineering}\\
+\Large \emph{University of Florida}
+\end{center}
+
+
+\newpage
+Exercise 1(ER)\\
+
+The academic world is an interesting example of international cooperation and exchange.
+This problem is concerned with modeling of a database that contains information on researchers, academic institutions, and collaborations among researchers. A researcher can
+either be employed as a professor or a lab assistant. There are three kinds of professors:
+Assistant, associate, and full professors. The following should be stored:
+
+\begin{itemize}
+\item
+For each researcher, his/her name, year of birth, and current position (if any). 
+
+\item 
+For each institution, its name, country, and inauguration year.
+
+\item 
+For each institution, the names of its schools (e.g. School of Law, School of Business,
+School of Computer Science,. . .). A school belongs to exactly one institution.
+
+\item 
+An employment history, including information on all employments (start and end
+date, position, and what school)
+\item
+Information about co-authorships, i.e., which researchers have co-authered a research
+paper. The titles of common research papers should also be stored.
+
+\item
+For each researcher, information on his/her highest degree (BSc, MSc or PhD), 
+including who was the main supervisor, and at what school.
+
+\item
+For each professor, information on what research projects (title, start date, and end
+date) he/she is involved in, and the total amount of grant money for which he/she
+was the main applicant.
+\end{itemize}
+
+\begin{itemize}
+\item
+Draw an E/R diagram for the data set described above. Make sure to indicate all
+cardinality constraints speciﬁed above. The E/R diagram should not contain redundant
+entity sets, relationships, or attributes. Also, use relationships whenever appropriate. If
+you need to make any assumptions, include them in your answer.
+\item
+Convert your E/R diagram from question a) into relations, and write SQL statements
+to create the relations. You may make any reasonable choice of data types. Remember
+to include any constraints that follow from the description of the data set or your E/R
+diagram, including primary key and foreign key constraints.
+\end{itemize}
+ 
+
+\newpage
+Exercise 2(Relational Algebra)\\
+Suppose you got an internship next summer in Bay Area. And you want to book a plane ticket
+from Gainesville to San Jose between date1 and date2. Consider the following schema for an airline database
+(primary key attributes are in \textbf{bold})
+
+\begin{itemize}
+\item 
+FLIGHTS($\textbf{flight\_num}$, \text{source\_city, destination\_city, distance})
+\item
+\text{DEPARTURES(\textbf{flight\_num, date}, plane\_type, price)}
+\item 
+\text{BOOKINGS(passenger\_id, flight\_num, date, seat\_number)}
+\end{itemize}
+
+Express the following queries in SQLs
+\begin{itemize}
+\item
+Find the direct flights from Gainesville to San Jose.
+
+\item 
+Find the possible itinerary that that have one-stop flights from Gainesville to San Jose.
+
+\item
+Find the cheapest direct flight from Gainesville to San Jose.
+
+\item 
+Find the cheapest one-stop flights from Gainesville to San Jose.
+
+\item
+Find the passengers who booked a flight from Gainesville to San Jose.
+
+\item
+Find the flights with one stop which still are not full.
+
+\end{itemize}
+
+\newpage
+Exercise 3\\
+Consider the following, self-explanatory database schema about employees:
+
+\begin{itemize}
+\item
+\text{employee(\textbf{employ\_name},street,city)}
+\item
+\text{works(\textbf{employ\_name},company\_name,salary)}
+\item
+\text{company(\textbf{company\_name},city)}
+\item
+\text{revenue(\textbf{company\_name},revenue)}
+\item
+\text{manages(\textbf{employ\_name},manager\_name)}
+\end{itemize}
+Primary key attributes are underlined. Foreign key attributes have the same names as the primary 
+keys they reference. Express the folloing queries in SQL:
+\begin{itemize}
+\item Find the lowest salary of all maximum salaries payed in each company.
+\item Companies may be located in serveral cities. Find the names of all companies located in every
+ city in which Small Bank Corporation is located.
+\item Find the names of the companies that have the most employees.
+\item Give all managers of Firt Bank Corporation 1 10-percent raise unless the salary becomes greater than
+ \$100,000; in such cases, give only 3-percent raise.
+\item Find the names of all employees who earn more than the average salary of all employees of their company.
+\item Find the names of companies that have the smallest payroll.
+\item Find the company which has the maximum revenue per-employee(revene/totalNumberofEmployee)
+
+\end{itemize}
+
+\end{document}
