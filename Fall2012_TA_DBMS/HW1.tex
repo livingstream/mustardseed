@@ -63,7 +63,7 @@ Signature \underline{\hspace{5cm}}
 
 
 \newpage
-Exercise 1(ER)\\
+\textbf{Exercise 1(ER Model)}\\
 
 The academic world is an interesting example of international cooperation and exchange.
 This problem is concerned with modeling of a database that contains information on researchers, academic institutions, and collaborations among researchers. A researcher can
@@ -111,10 +111,107 @@ to include any constraints that follow from the description of the data set or y
 diagram, including primary key and foreign key constraints.
 \end{itemize}
  
+\newpage
+\textbf{Exercise 2(Oracle SQL DML)}\\
+
+Consider the following table ‘Employee’ managed by a company.
+\begin {table}[h]
+\begin{center}
+  \footnotesize\tt
+\begin{tabular}{|l|l|l|l|l|l|l|}
+  \hline
+  FIRST\_NAME & LAST\_NAME & START\_DATE & END\_DATE & SALARY & CITY& DESCRIPTION\\
+  \hline
+  Jason & Martin & 25-Jul-1996 & 25-Jul-2006& 1234.56& Toronto& Programmer\\
+  \hline
+  Alison & Mathews & 21-Mar-1976 &  25-Jul-1986 & 1834.98& Boston& Manager\\
+  \hline
+  James &Smith & 12-Dec-1978 & 15-Apr-2006& 5239.56& Mountain View& Programmer\\
+  \hline
+  Celia & Rice & 24-Oct-1982 & 9-Jul-2006& 2294.76& San Jose& Tester\\
+  \hline
+  Robert & Black & 15-Jan-1984 & 5-Jul-2006& 1284.16& New York& Tester\\
+  \hline
+  Linda & Green & 30-Jul-1987& 4-Jan-2006& 6298.48& Palo Alto& Programmer\\
+  \hline
+  David & Larry & 31-Dec-1990& 11-Feb-2006& 4254.16& Pittsburgh& Manager\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+Provide SQL statements for the following operations:
+\begin{itemize}
+\item
+Determine the first name of the employees who started after 1st Jan 1990 and the last
+name starts with 'M'
+\item
+Determine the number of employees who work at ‘New York’
+\item
+Determine the average salary of a ‘Tester’
+\item
+Insert a new record to the Employee table containing the following values :\\
+\begin{table}[h]
+\begin{center}
+  \footnotesize\tt
+\begin{tabular}{|l|l|l|l|l|l|l|}
+  \hline
+  James & Cat & 17-Sep-1996& 15-Apr-2002& 8777.48& Vancouver& Tester\\
+  \hline
+\end{tabular}
+\end{center}
+\end{table}
+\item
+Delete the record for ‘Robert Black’
+\item
+Correct the salary of ‘Jason Martin’ to 2000.
+\item
+What does this SQL statement return?\\
+Select max(salary)\\
+From employee\\
+Where salary $<$ (select max(salary) from employee)
+\end{itemize}
+
 
 \newpage
-Exercise 2(Relational Algebra)\\
-Suppose you got an internship next summer in Bay Area. And you want to book a plane ticket
+\textbf{Exercise 3(Relational Calculus)}\\
+
+Consider the following database schema:
+\begin{itemize}
+\item MANUFACTURER (mid:integer, mname:string, maddress:string, assets: real)
+\item ITEMS (item\_id:integer, item\_name:string, color:string, size:string)
+\item CATALOG (mid:integer, item\_id:integer, cost:real)
+\item INVENTORY (mid:integer, item\_id:integer, num\_items:integer)
+\end{itemize}
+For the following questions, write Tuple Relational Calculus
+expression, and Domain Relational Calculus.
+\begin{itemize}
+\item
+Find the names of manufacturers who provide items having ‘orange’ colors 
+\item
+Find the mids of manufacturers who provide every green items 
+\item
+Find the mids of manufacturers who provide some red or green items
+\item 
+Find the mids of manufacturers who provide some red items or are at "1225 SW 13th St.
+Gainesville, FL 32611"
+\item
+Find the item\_ids of items provided by at least two different manufacturers.
+\item 
+Let A=(X,Y,Z) and let A\_1 and A\_2 both be relations on database schema A.
+Write the domain relational calculus expression to the following:
+\begin{itemize}
+\item $\sigma_{z=100}(A_2)$
+\item $A_1 \bigcap A_2$
+\item $A_1 \bigcup A_2$
+\item $A_1 - A_2$
+\item $\pi_{X,Y}(A_1) \bowtie \pi_{Y,Z}(A_2)$
+\end{itemize}
+\end{itemize}
+
+
+\newpage
+\textbf{Exercise 4(Relational Algebra)}\\
+
+Suppose you want to book a plane ticket
 from Gainesville to San Jose between date1 and date2. Consider the following schema for an airline database
 (primary key attributes are in \textbf{bold})
 
@@ -124,35 +221,35 @@ FLIGHTS($\textbf{flight\_num}$, \text{source\_city, destination\_city, distance}
 \item
 \text{DEPARTURES(\textbf{flight\_num, date}, plane\_type, price)}
 \item 
-\text{BOOKINGS(passenger\_id, flight\_num, date, seat\_number)}
+\text{BOOKINGS(\textbf{passenger\_id, flight\_num, date}, seat\_number)}
 \end{itemize}
 
 Express the following queries in SQLs
 \begin{itemize}
 \item
-Find the direct flights from Gainesville to San Jose.
+Find the itineraries that direct flight from Gainesville to San Jose.
 
 \item 
-Find the possible itinerary that that have one-stop flights from Gainesville to San Jose.
+Find the itineraries that that have one-stop flights from Gainesville to San Jose.
 
 \item
-Find the cheapest direct flight from Gainesville to San Jose.
+Find the cheapest itineraries that direct flight from Gainesville to San Jose.
 
 \item 
-Find the cheapest one-stop flights from Gainesville to San Jose.
+Find the cheapest itineraries that have one-stop flights from Gainesville to San Jose.
 
 \item
-Find the passengers who booked a flight from Gainesville to San Jose.
+Find the passengers who booked direct flights and one-stop flights from Gainesville to San Jose.
 
 \item
-Find the flights with one stop which still are not full.
+Find the shortest distance itineraries among the cheapest itineraries with one-stop flights.
 
 \end{itemize}
 
 \newpage
-Exercise 3\\
-Consider the following, self-explanatory database schema about employees:
+\textbf{Exercise 5(Oracle SQLs)}\\
 
+Consider the following, self-explanatory database schema about employees:
 \begin{itemize}
 \item
 \text{employee(\textbf{employ\_name},street,city)}
@@ -165,19 +262,19 @@ Consider the following, self-explanatory database schema about employees:
 \item
 \text{manages(\textbf{employ\_name},manager\_name)}
 \end{itemize}
-Primary key attributes are underlined. Foreign key attributes have the same names as the primary 
+Primary key attributes are in bold. Foreign key attributes have the same names as the primary 
 keys they reference. Express the folloing queries in SQL:
 \begin{itemize}
 \item Find the lowest salary of all maximum salaries payed in each company.
 \item Companies may be located in serveral cities. Find the names of all companies located in every
  city in which Small Bank Corporation is located.
-\item Find the names of the companies that have the most employees.
-\item Give all managers of Firt Bank Corporation 1 10-percent raise unless the salary becomes greater than
+\item Find the names of the companies that have the largest number of employees.
+\item Give all managers of Firt Bank Corporation 10-percent raise unless the salary becomes greater than
  \$100,000; in such cases, give only 3-percent raise.
 \item Find the names of all employees who earn more than the average salary of all employees of their company.
 \item Find the names of companies that have the smallest payroll.
-\item Find the company which has the maximum revenue per-employee(revene/totalNumberofEmployee)
-
+\item Find the company which has the maximum revenue per-employee(revenue/totalNumberofEmployee).
+\item Find the companies which have sites in all the cities in this database table.
 \end{itemize}
 
 \end{document}
